@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <form class="d-flex justify-content-center mb-4" method="get" action="{% url 'service_list' %}">
+        <input type="text" name="q" class="form-control w-50" placeholder="Rechercher un service..."
+            value="{{ request.GET.q|default:'' }}">
+        <button type="submit" class="btn btn-primary ms-2">
+            <i class="bi bi-search"></i> Rechercher
+        </button>
+    </form>
+
+
+    <h2 class="mb-4 text-center text-primary fw-bold">
+        Liste des services disponibles
+    </h2>
+
+    {% if query %}
+        <p class="text-muted text-center">
+            Résultats pour : <strong>{{ query }}</strong>
+        </p>
+    {% endif %}
+
+    {% if services %}
+        <div class="row">
+            {% for service in services %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ service.titre }}</h5>
+                            <p class="card-text">{{ service.description|truncatewords:25 }}</p>
+                            <p class="fw-bold text-success mb-1">{{ service.prix }} FCFA</p>
+                            <p class="text-muted small mb-2">
+                                Catégorie : {{ service.categorie }}
+                            </p>
+                            <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">Voir plus</a>
+                        </div>
+                        <div class="card-footer text-muted small">
+                            Publié le {{ service.date_publication|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-muted mt-4">
+            Aucun service trouvé pour le moment.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

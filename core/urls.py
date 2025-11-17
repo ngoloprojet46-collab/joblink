@@ -1,0 +1,51 @@
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from . import views
+from .views import detail_commande
+from . import views_admin
+
+urlpatterns = [
+    
+    path('admin-dashboard/', views_admin.admin_dashboard, name='admin_dashboard'),
+
+    # Authentification
+    path('register/', views.register_view, name='register'),
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+
+    # Tableau de bord
+    path('dashboard/', views.redirection_dashboard, name='dashboard'),
+    path('tableau-prestataire/', views.tableau_prestataire, name='tableau_prestataire'),
+    path('tableau-demandeur/', views.tableau_demandeur, name='tableau_demandeur'),
+
+    # Notifications
+    path('notifications/', views.mes_notifications, name='mes_notifications'),
+    path('notification/<int:notification_id>/lue/', views.marquer_notification_lue, name='marquer_notification_lue'),
+    path('notifications/tout-lu/', views.tout_marquer_lu, name='tout_marquer_lu'),
+    path('notification/<int:notification_id>/supprimer/', views.supprimer_notification, name='supprimer_notification'),
+    path('notification/voir-prestataire/<int:notif_id>/', views.voir_prestataire_depuis_notification, name='voir_prestataire_depuis_notification'),
+
+    # Prestataire
+    path('prestataire/<int:prestataire_id>/', views.prestataire_detail, name='prestataire_detail'),
+
+    # Services
+    path('', views.home, name='home'),
+    path('services/', views.service_list, name='service_list'),
+    path('services/<int:pk>/', views.service_detail, name='service_detail'),
+    path('add-service/', views.add_service, name='add_service'),
+    path('search/', views.quick_search, name='quick_search'),
+    path('service/modifier/<int:service_id>/', views.modifier_service, name='modifier_service'),
+    path('service/supprimer/<int:service_id>/', views.supprimer_service, name='supprimer_service'),
+    path('service/<int:service_id>/commander/', views.commander_service, name='commander_service'),
+
+    # Commandes
+    path('commande/<int:commande_id>/', detail_commande, name='detail_commande'),
+    path('commande/<int:commande_id>/accepter/', views.accepter_commande, name='accepter_commande'),
+    path('commande/<int:commande_id>/terminer/', views.terminer_commande, name='terminer_commande'),
+    path('commande/<int:commande_id>/annuler/', views.annuler_commande, name='annuler_commande'),
+    path('commande/<int:commande_id>/supprimer/', views.supprimer_commande, name='supprimer_commande'),
+    path('commande/<int:commande_id>/supprimer_prestataire/', views.supprimer_commande_prestataire, name='supprimer_commande_prestataire'),
+
+    path('abonnement/expire/', views.abonnement_expire, name='abonnement_expire'),
+    path('abonnement/', views.gerer_abonnement, name='gerer_abonnement'),
+]

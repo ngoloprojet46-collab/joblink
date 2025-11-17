@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center text-primary fw-bold mb-4">Mes notifications</h2>
+
+    {% if notifications %}
+        <ul class="list-group shadow-sm">
+            {% for notif in notifications %}
+                <li class="list-group-item d-flex justify-content-between align-items-center {% if not notif.lue %}list-group-item-warning{% endif %}">
+                    <div>
+                        <i class="bi bi-bell-fill text-primary me-2"></i>
+                        {{ notif.message }}
+                        <br>
+                        <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    {% if not notif.lue %}
+                        <span class="badge bg-primary">Nouvelle</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-center text-muted">Aucune notification pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

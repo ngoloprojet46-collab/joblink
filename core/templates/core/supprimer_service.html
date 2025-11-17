@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h3>Confirmer la suppression</h3>
+    <p>Voulez-vous vraiment supprimer le service <strong>"{{ service.titre }}"</strong> ?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}
+

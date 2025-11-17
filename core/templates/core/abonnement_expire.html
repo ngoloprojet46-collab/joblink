@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Votre abonnement a expiré 😢</h2>
+<p>Pour continuer à utiliser nos services, veuillez renouveler votre abonnement.</p>
+<a href="{% url 'gerer_abonnement' %}" class="btn btn-primary">Renouveler mon abonnement</a>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% block content %}
+<h1>📊 Tableau de bord JobLink</h1>
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+
+  <div class="card" style="padding:20px; background:#f9f9f9; border-radius:10px;">
+    <h3>Utilisateurs totaux</h3>
+    <p>{{ total_users }}</p>
+  </div>
+
+  <div class="card" style="padding:20px; background:#f9f9f9; border-radius:10px;">
+    <h3>Prestataires</h3>
+    <p>{{ prestataires }}</p>
+  </div>
+
+  <div class="card" style="padding:20px; background:#f9f9f9; border-radius:10px;">
+    <h3>Demandeurs</h3>
+    <p>{{ demandeurs }}</p>
+  </div>
+
+  <div class="card" style="padding:20px; background:#f9f9f9; border-radius:10px;">
+    <h3>Services publiés</h3>
+    <p>{{ total_services }}</p>
+  </div>
+
+  <div class="card" style="padding:20px; background:#f9f9f9; border-radius:10px;">
+    <h3>Commandes</h3>
+    <p>{{ total_commandes }}</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4" style="background-color: #f9fbfd;">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-3 text-primary fw-bold">
+            <i class="bi bi-pencil-square me-2"></i> Modifier le service
+          </h2>
+          <p class="text-center text-muted mb-4">
+            Mettez à jour les informations de votre service facilement.
+          </p>
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Champ image -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Image actuelle :</label><br>
+                {% if form.instance.image %}
+                <img src="{{ form.instance.image.url }}" alt="Image actuelle" class="img-fluid rounded mb-2" style="max-height: 180px;">
+                {% else %}
+                <p class="text-muted">Aucune image disponible.</p>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Changer l'image :</label>
+                {{ form.image }}
+            </div>
+
+            <hr>
+
+            <!-- Les autres champs du formulaire -->
+            <div class="mb-3">
+                {{ form.titre.label_tag }}
+                {{ form.titre }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.prix.label_tag }}
+                {{ form.prix }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.telephone.label_tag }}
+                {{ form.telephone }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.adresse.label_tag }}
+                {{ form.adresse }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.categorie.label_tag }}
+                {{ form.categorie }}
+            </div>
+
+
+            <!-- Boutons -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                <button type="submit" class="btn btn-primary fw-semibold py-2 px-4 rounded-3">
+                <i class="bi bi-check-circle me-1"></i> Enregistrer les modifications
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary py-2 px-4 rounded-3">
+                <i class="bi bi-x-circle me-1"></i> Annuler
+                </a>
+                </div>
+            </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

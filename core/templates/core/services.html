@@ -1,0 +1,32 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Services disponibles</h2>
+
+  {% if services %}
+  <div class="row">
+    {% for service in services %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ service.titre }}</h5>
+          <p class="card-text text-muted">{{ service.categorie }}</p>
+          <p class="fw-bold text-success">{{ service.prix }} FCFA</p>
+          <p class="text-truncate">{{ service.description }}</p>
+          <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm mt-2">
+            Voir les détails
+          </a>
+        </div>
+        <div class="card-footer text-muted small">
+          Publié le {{ service.date_publication|date:"d/m/Y à H:i" }}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-center">Aucun service disponible pour le moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

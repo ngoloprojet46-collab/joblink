@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Mon abonnement</h2>
+
+<p>Début : {{ abonnement.date_debut }}</p>
+<p>Fin : {{ abonnement.date_fin }}</p>
+
+{% if abonnement.actif %}
+    <p style="color: green;">Statut : Actif</p>
+{% else %}
+    <p style="color: red;">Statut : Expiré</p>
+    <a href="{% url 'abonnement_expire' %}">Voir détails</a>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Renouveler l'abonnement</button>
+</form>
+{% endblock %}

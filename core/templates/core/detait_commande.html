@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <h3 class="text-primary mb-3">Détails de la commande</h3>
+
+    <div class="card shadow-sm p-3">
+        <h5>{{ commande.service.titre }}</h5>
+        <p><strong>Prix :</strong> {{ commande.service.prix }} FCFA</p>
+        <p><strong>Statut :</strong> {{ commande.get_statut_display }}</p>
+        <p><strong>Date :</strong> {{ commande.date_commande|date:"d/m/Y H:i" }}</p>
+
+        {% if commande.statut == 'acceptee' %}
+            <hr>
+            <h5 class="text-success mt-3">✅ Prestataire</h5>
+            <p><strong>Nom :</strong> {{ commande.service.prestataire.user.username }}</p>
+            <p><strong>Email :</strong> {{ commande.service.prestataire.email }}</p>
+            <p><strong>Téléphone :</strong> {{ commande.service.prestataire.telephone }}</p>
+            <p><strong>Adresse :</strong> {{ commande.service.prestataire.adresse }}</p>
+            <p><strong>Localisation :</strong> {{ commande.service.prestataire.localisation }}</p>
+        {% else %}
+            <div class="alert alert-info mt-3">
+                ⏳ En attente d'acceptation par le prestataire.
+            </div>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Retour au tableau de bord</a>
+</div>
+{% endblock %}
+

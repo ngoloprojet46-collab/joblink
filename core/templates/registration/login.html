@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+          
+          <h2 class="text-center mb-4 text-primary fw-bold">
+            <i class="bi bi-box-arrow-in-right me-2"></i> Connexion à JobLink
+          </h2>
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nom d'utilisateur</label>
+              {{ form.username }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mot de passe</label>
+              <div class="input-group">
+                {{ form.password }}
+                <button type="button" class="btn btn-outline-secondary toggle-password">
+                    <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary fw-semibold py-2 rounded-3">
+                <i class="bi bi-door-open me-1"></i> Se connecter
+              </button>
+            </div>
+          </form>
+
+          <div class="text-center mt-4">
+            <p class="text-muted">
+              Pas encore de compte ?
+              <a href="{% url 'register' %}" class="fw-semibold text-primary">Créer un compte</a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script pour l'œil -->
+<script>
+document.querySelector('.toggle-password').addEventListener('click', function () {
+    let input = this.parentElement.querySelector('input');
+    if (input.type === "password") {
+        input.type = "text";
+        this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+        input.type = "password";
+        this.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+});
+</script>
+
+{% endblock %}

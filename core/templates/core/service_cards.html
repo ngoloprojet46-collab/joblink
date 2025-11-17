@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% if services %}
+    <div class="row">
+        {% for service in services %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{{ service.titre }}</h5>
+                        <p class="card-text">{{ service.description|truncatewords:25 }}</p>
+                        <p class="fw-bold text-success mb-1">{{ service.prix }} FCFA</p>
+                        <p class="text-muted small mb-2">
+                            Catégorie : {{ service.categorie }}
+                        </p>
+                        <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
+                            Voir plus
+                        </a>
+                    </div>
+                    <div class="card-footer text-muted small">
+                        Publié le {{ service.date_publication|date:"d/m/Y" }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-center text-muted mt-4">
+        Aucun service trouvé pour le moment.
+    </p>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Section d’accueil -->
+<section class="py-5 text-center bg-light rounded-3 shadow-sm">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-primary">Bienvenue sur JobLink</h1>
+        <p class="lead mb-4">
+            Trouvez facilement les meilleurs prestataires de services dans votre ville — 
+            ou proposez vos compétences à ceux qui en ont besoin !
+        </p>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'service_list' %}" class="btn btn-primary btn-lg me-2">
+                Voir les services disponibles
+            </a>
+            <a href="{% url 'add_service' %}" class="btn btn-outline-primary btn-lg">
+                Publier un service
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">
+                Créer un compte
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                Se connecter
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Section des services récents -->
+<section class="mt-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Services récents</h2>
+
+        <div class="row">
+            {% for service in services %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        
+                        <!-- 🖼 Image ou 🎥 Vidéo -->
+                        {% if service.image %}
+                            <a href="{{ service.image.url }}" data-bs-toggle="modal" data-bs-target="#mediaModal{{ service.id }}">
+                                <img src="{{ service.image.url }}" 
+                                     class="card-img-top rounded-top"
+                                     alt="Image du service"
+                                     style="height: 200px; object-fit: cover; border-radius: 12px; cursor: pointer;">
+                            </a>
+
+                        {% elif service.video %}
+                        <div class="position-relative">
+                            <video class="card-img-top rounded-top" 
+                                    style="height: 200px; object-fit: cover; border-radius: 12px;"
+                                    controls>
+                                    <source src="{{ service.video.url }}" type="video/mp4">
+                                    Votre navigateur ne supporte pas la lecture vidéo.
+                            </video>
+
+
+                            <!-- Bouton lecture au centre -->
+                        </div>
+
+                        {% else %}
+                            <img src="{% static 'images/default_service.jpg' %}" 
+                                 class="card-img-top rounded-top"
+                                 alt="Image par défaut"
+                                 style="height: 200px; object-fit: cover; border-radius: 12px;">
+                        {% endif %}
+
+                        <!-- Corps de la carte -->
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ service.titre }}</h5>
+                            <p class="fw-bold text-success mb-1">{{ service.prix }} FCFA</p>
+                            <p class="text-muted small mb-2">Catégorie : {{ service.categorie }}</p>
+
+                            {% if user.is_authenticated %}
+                                <p class="card-text">{{ service.description|truncatewords:25 }}</p>
+                                <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
+                                    Voir plus
+                                </a>
+                            {% else %}
+                                <p class="text-muted fst-italic">Connectez-vous pour voir plus de détails</p>
+                                <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Connexion</a>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer text-muted small">
+                            Publié le {{ service.date_publication|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🪟 Fenêtre modale pour afficher image/vidéo en grand -->
+                <div class="modal fade" id="mediaModal{{ service.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0 shadow-lg">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title text-primary">{{ service.titre }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                {% if service.image %}
+                                    <img src="{{ service.image.url }}" class="img-fluid rounded shadow" alt="Image du service">
+                                {% elif service.video %}
+                                <video controls class="w-100 rounded shadow">
+                                    <source src="{{ service.video.url }}" type="video/mp4">
+                                </video>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <h2 class="text-primary text-center mb-4">👨‍🔧 Informations sur le prestataire</h2>
+
+    <div class="card shadow-sm p-4">
+        <h4>{{ prestataire.user.username }}</h4>
+        <p><strong>Email :</strong> {{ prestataire.user.email }}</p>
+        <p><strong>Téléphone :</strong> {{ prestataire.services.last.telephone }}</p>
+        <p><strong>Adresse :</strong> {{ prestataire.services.last.adresse }}</p>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'mes_notifications' %}" class="btn btn-outline-secondary">
+            ⬅ Retour aux notifications
+        </a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <h4 class="text-primary mb-4 text-center">Résultats de la recherche</h4>
+
+    {% if query %}
+        <p class="text-center text-muted">
+            Vous avez recherché : <strong>{{ query }}</strong>
+        </p>
+    {% endif %}
+
+    {% if services %}
+        <div class="row">
+            {% for service in services %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ service.titre }}</h5>
+                            <p class="card-text small text-muted">{{ service.categorie }}</p>
+                            <p class="fw-bold text-success">{{ service.prix }} FCFA</p>
+                            <p class="card-text small text-muted">{{ service.adresse }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-muted mt-4">Aucun service trouvé.</p>
+    {% endif %}
+</div>
+{% endblock %}
