@@ -82,10 +82,13 @@ TEMPLATES = [
 #  DATABASE
 # ----------------------------------------
 DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    'default': dj_database_url.parse(
+        "postgresql://joblink_db_fpsq_user:yrc0v60OT4UudPanROaiIbby50QO69iZ@dpg-d4e1p33e5dus73f7evqg-a/joblink_db_fpsq",
+        conn_max_age=600,
+        ssl_require=True
     )
 }
+
 
 # ----------------------------------------
 #  AUTHENTIFICATION
