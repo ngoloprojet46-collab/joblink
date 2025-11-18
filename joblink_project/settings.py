@@ -16,8 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ----------------------------------------
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
-# En local, pour Render et localhost
-ALLOWED_HOSTS = ['joblink-fdot.onrender.com']
+# En local, pour Render et localhost "joblink-fdot.onrender.com" "127.0.0.1", "localhost"
+ALLOWED_HOSTS = ["joblink-fdot.onrender.com"]
 
 
 # ----------------------------------------
@@ -79,15 +79,18 @@ TEMPLATES = [
 ]
 
 # ----------------------------------------
-#  DATABASE
+#  DATABASE "postgresql://joblink_db_fpsq_user:yrc0v60OT4UudPanROaiIbby50QO69iZ@dpg-d4e1p33e5dus73f7evqg-a/joblink_db_fpsq", 
 # ----------------------------------------
 DATABASES = {
-    'default': dj_database_url.parse(
-        "postgresql://joblink_db_fpsq_user:yrc0v60OT4UudPanROaiIbby50QO69iZ@dpg-d4e1p33e5dus73f7evqg-a/joblink_db_fpsq",
+    "default": dj_database_url.parse(
+        "postgres://user:password@host:port/dbname",
         conn_max_age=600,
         ssl_require=True
     )
 }
+
+
+
 
 
 # ----------------------------------------
