@@ -83,7 +83,7 @@ TEMPLATES = [
 # ----------------------------------------
 DATABASES = {
     "default": dj_database_url.parse(
-        "postgres://user:password@host:port/dbname",
+        "postgresql://joblink_db_fpsq_user:yrc0v60OT4UudPanROaiIbby50QO69iZ@dpg-d4e1p33e5dus73f7evqg-a/joblink_db_fpsq",
         conn_max_age=600,
         ssl_require=True
     )
