@@ -16,7 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ----------------------------------------
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+# En local, pour Render et localhost
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'joblink-fdot.onrender.com']
+
 
 # ----------------------------------------
 #  APPLICATIONS
