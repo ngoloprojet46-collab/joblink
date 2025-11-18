@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: joblink-2
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn joblink_project.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.10
