@@ -12,7 +12,7 @@ import cloudinary.api
 # ----------------------------------------
 # BASE DIRECTORY
 # ----------------------------------------
-BASE_DIR = Path(_file_).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ----------------------------------------
 # SECURITY
