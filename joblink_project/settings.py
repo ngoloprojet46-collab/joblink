@@ -33,6 +33,9 @@ INSTALLED_APPS = [
 
     # Votre app
     'core',
+    'cloudinary',
+    'cloudinary_storage',
+
 ]
 
 # ----------------------------------------
@@ -140,3 +143,20 @@ MEDIA_ROOT = BASE_DIR / "media"
 #  DEFAULT PRIMARY KEY FIELD
 # ----------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@dxndciemg
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+cloudinary.config( 
+  cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+  api_key = os.getenv("CLOUDINARY_API_KEY"), 
+  api_secret = os.getenv("CLOUDINARY_API_SECRET")
+)
+
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
