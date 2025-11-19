@@ -21,7 +21,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    'joblink-1-b65k.onrender.com',
+    'joblink-fdot.onrender.com',
     '127.0.0.1',
     'localhost'
 ]
