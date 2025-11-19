@@ -144,7 +144,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 # ----------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@dxndciemg
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 
