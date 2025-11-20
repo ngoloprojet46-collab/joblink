@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,11 +11,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Sécurité
 # -------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
-#DEBUG = True
+#DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 if DEBUG:
     ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 else:
+    #ALLOWED_HOSTS = ['joblink-2-54tn.onrender.com']
     ALLOWED_HOSTS = ['joblink-fdot.onrender.com']
 
 
@@ -103,9 +107,20 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # Cloudinary configuration automatique via CLOUDINARY_URL
+#import cloudinary
+#cloudinary.config(
+    #cloudinary_url=os.getenv("CLOUDINARY_URL")
+#)
+
 import cloudinary
-cloudinary.config(
-    cloudinary_url=os.getenv("CLOUDINARY_URL")
+import cloudinary.uploader
+import cloudinary.api
+
+cloudinary.config( 
+  cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+  api_key = os.getenv("CLOUDINARY_API_KEY"),
+  api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+  secure = True
 )
 
 # -------------------------

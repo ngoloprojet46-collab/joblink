@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta, date
 from django.conf import settings
+from cloudinary.models import CloudinaryField
 
 
 class User(AbstractUser):
@@ -50,8 +51,9 @@ class Service(models.Model):
     disponible = models.BooleanField(default=True)
     
     # 🖼 Image et 🎥 Vidéo optionnelles
-    image = models.ImageField(upload_to='services/images/', blank=True, null=True)
-    video = models.FileField(upload_to='services/videos/', blank=True, null=True)
+    image = CloudinaryField("image", blank=True, null=True)
+    video = CloudinaryField("video", blank=True, null=True)
+
 
     def __str__(self):
         return self.titre
