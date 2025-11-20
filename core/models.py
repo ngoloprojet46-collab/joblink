@@ -52,7 +52,7 @@ class Service(models.Model):
     
     # 🖼 Image et 🎥 Vidéo optionnelles
     image = CloudinaryField("image", blank=True, null=True)
-    video = CloudinaryField("video", blank=True, null=True)
+    video = CloudinaryField(resource_type="video", blank=True, null=True)
 
 
     def __str__(self):
