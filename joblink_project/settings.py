@@ -13,7 +13,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 #DEBUG = True
-ALLOWED_HOSTS = ['joblink-fdot.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com',                 # accepte tous les sous-domaines Render
+    'joblink-fdot.onrender.com',     # ton lien actuel
+]
+
 
 # -------------------------
 # Applications
