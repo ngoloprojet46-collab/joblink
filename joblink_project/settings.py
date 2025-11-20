@@ -138,7 +138,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Cloudinary gère les fichiers statiques en production
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ----------------------------------------
 # MEDIA FILES (gérés par Cloudinary)
@@ -151,11 +151,10 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # ----------------------------------------
 # CLOUDINARY CONFIG
 # ----------------------------------------
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET")
-)
+import cloudinary
+import cloudinary_storage
+cloudinary.config(cloudinary_url=os.getenv("cloudinary://278312822864487:PYeM1ejbj13VOBKjcFwVRgmVZVg@dxndciemg"))
+
 
 
 # ----------------------------------------
