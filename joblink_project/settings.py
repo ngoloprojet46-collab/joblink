@@ -15,11 +15,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 #DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 else:
-    ALLOWED_HOSTS = [
-        'joblink-2-54tn.onrender.com',
-        'joblink-fdot.onrender.com',
-        '.onrender.com',   # Autorise tout sous-domaine de Render
-    ]
+    ALLOWED_HOSTS = ['joblink-fdot.onrender.com']
 
 
 # -------------------------
