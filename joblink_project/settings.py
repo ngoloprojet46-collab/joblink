@@ -1,163 +1,119 @@
-"""
-Django settings for joblink_project.
-"""
-
 import os
 from pathlib import Path
 import dj_database_url
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 
-# ----------------------------------------
-# BASE DIRECTORY
-# ----------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ----------------------------------------
-# SECURITY
-# ----------------------------------------
+# -------------------------
+# Sécurité
+# -------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 #DEBUG = True
-ALLOWED_HOSTS = [
-    'joblink-fdot.onrender.com',
-    '127.0.0.1',
-    'localhost'
-]
+if DEBUG:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+else:
+    ALLOWED_HOSTS = ['joblink-fdot.onrender.com']
 
-# ----------------------------------------
-# APPLICATIONS
-# ----------------------------------------
+
+# -------------------------
+# Applications
+# -------------------------
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    # App principale
-    'core',
+    "cloudinary",
+    "cloudinary_storage",
 
+    "core",
 ]
 
-# Add cloudinary apps only if we enable cloudinary (import later)
-USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "False") == "True"
-if USE_CLOUDINARY:
-    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
-
-
-# ----------------------------------------
-# MIDDLEWARE
-# ----------------------------------------
+# -------------------------
+# Middleware
+# -------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-
-    # WhiteNoise pour Render
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
-    # Middleware perso
-    'core.middleware.AbonnementMiddleware',
 ]
 
-# ----------------------------------------
-# URLS & WSGI
-# ----------------------------------------
-ROOT_URLCONF = 'joblink_project.urls'
-WSGI_APPLICATION = 'joblink_project.wsgi.application'
+ROOT_URLCONF = "joblink_project.urls"
+WSGI_APPLICATION = "joblink_project.wsgi.application"
 
-# ----------------------------------------
-# TEMPLATES
-# ----------------------------------------
+# -------------------------
+# Templates
+# -------------------------
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Ajouter un dossier templates si nécessaire
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-# ----------------------------------------
-# DATABASE (Render utilise DATABASE_URL automatiquement)
-# ----------------------------------------
+# -------------------------
+# Database
+# -------------------------
 DATABASES = {
     "default": dj_database_url.config(
-        default="sqlite:///db.sqlite3",  
+        default="sqlite:///db.sqlite3",
         conn_max_age=600,
-        ssl_require=False
+        ssl_require=False,
     )
 }
 
-# ----------------------------------------
-# AUTHENTIFICATION
-# ----------------------------------------
-AUTH_USER_MODEL = 'core.User'
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'login'
-LOGIN_URL = 'login'
+# -------------------------
+# Auth
+# -------------------------
+AUTH_USER_MODEL = "core.User"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGOUT_REDIRECT_URL = "login"
+LOGIN_URL = "login"
 
-# ----------------------------------------
-# PASSWORD VALIDATORS
-# ----------------------------------------
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {"NAME": 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {"NAME": 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {"NAME": 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-# ----------------------------------------
-# INTERNATIONALIZATION
-# ----------------------------------------
-LANGUAGE_CODE = 'fr'
-TIME_ZONE = 'Africa/Abidjan'
-USE_I18N = True
-USE_TZ = True
-
-# ----------------------------------------
-# STATIC FILES
-# ----------------------------------------
+# -------------------------
+# Static Files (gérés par WhiteNoise)
+# -------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# Cloudinary gère les fichiers statiques en production
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# ----------------------------------------
-# MEDIA FILES (gérés par Cloudinary)
-# ----------------------------------------
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+# -------------------------
+# Media Files (Cloudinary)
+# -------------------------
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# ----------------------------------------
-# CLOUDINARY CONFIG
-# ----------------------------------------
+# Cloudinary configuration automatique via CLOUDINARY_URL
 import cloudinary
-import cloudinary_storage
-cloudinary.config(cloudinary_url=os.getenv("cloudinary://278312822864487:PYeM1ejbj13VOBKjcFwVRgmVZVg@dxndciemg"))
+cloudinary.config(
+    cloudinary_url=os.getenv("CLOUDINARY_URL")
+)
 
+# -------------------------
+# Internationalization
+# -------------------------
+LANGUAGE_CODE = "fr"
+TIME_ZONE = "Africa/Abidjan"
+USE_I18N = True
+USE_TZ = True
 
-
-# ----------------------------------------
-# DEFAULT AUTO FIELD
-# ----------------------------------------
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
