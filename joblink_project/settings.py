@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     # App principale
     'core',
 
-    # Cloudinary
-    'cloudinary',
-    'cloudinary_storage',
 ]
+
+# Add cloudinary apps only if we enable cloudinary (import later)
+USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "False") == "True"
+if USE_CLOUDINARY:
+    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+
 
 # ----------------------------------------
 # MIDDLEWARE
