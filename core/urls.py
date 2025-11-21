@@ -1,12 +1,14 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import detail_commande
+from .views import detail_commande, profil_view
 from . import views_admin
 
 urlpatterns = [
     
     path('admin-dashboard/', views_admin.admin_dashboard, name='admin_dashboard'),
+
+    path('profil/', profil_view, name='profil'),
 
     # Authentification
     path('register/', views.register_view, name='register'),

@@ -23,8 +23,19 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'role', 'password1', 'password2']
+        fields = ['username', 'email', 'phone', 'role', 'password1', 'password2', 'photo']
 
+
+class ProfilUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'phone', 'photo']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
 
 class CustomLoginForm(AuthenticationForm):
     username = forms.CharField(

@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container py-4">
+
+    <!-- BARRE DE RECHERCHE -->
     <form class="d-flex justify-content-center mb-4" method="get" action="{% url 'service_list' %}">
         <input type="text" name="q" class="form-control w-50" placeholder="Rechercher un service..."
-            value="{{ request.GET.q|default:'' }}">
+               value="{{ request.GET.q|default:'' }}">
         <button type="submit" class="btn btn-primary ms-2">
             <i class="bi bi-search"></i> Rechercher
         </button>
     </form>
-
 
     <h2 class="mb-4 text-center text-primary fw-bold">
         Liste des services disponibles
@@ -23,9 +25,34 @@
 
     {% if services %}
         <div class="row">
+
             {% for service in services %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm border-0">
+
+                        <!-- 🖼 Image ou 🎥 Vidéo -->
+                        {% if service.image %}
+                            <img src="{{ service.image.url }}" 
+                                 class="card-img-top rounded-top"
+                                 alt="Image du service"
+                                 style="height: 200px; object-fit: cover; border-radius: 12px;">
+                        
+                        {% elif service.video %}
+                            <video class="card-img-top rounded-top"
+                                   style="height: 200px; object-fit: cover; border-radius: 12px;"
+                                   controls>
+                                <source src="{{ service.video.url }}" type="video/mp4">
+                                Votre navigateur ne supporte pas la vidéo.
+                            </video>
+
+                        {% else %}
+                            <img src="{% static 'images/default_service.jpg' %}"
+                                 class="card-img-top rounded-top"
+                                 alt="Image par défaut"
+                                 style="height: 200px; object-fit: cover; border-radius: 12px;">
+                        {% endif %}
+
+                        <!-- Texte -->
                         <div class="card-body">
                             <h5 class="card-title text-primary">{{ service.titre }}</h5>
                             <p class="card-text">{{ service.description|truncatewords:25 }}</p>
@@ -33,15 +60,20 @@
                             <p class="text-muted small mb-2">
                                 Catégorie : {{ service.categorie }}
                             </p>
-                            <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">Voir plus</a>
+                            <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
+                                Voir plus
+                            </a>
                         </div>
+
                         <div class="card-footer text-muted small">
                             Publié le {{ service.date_publication|date:"d/m/Y" }}
                         </div>
                     </div>
                 </div>
             {% endfor %}
+
         </div>
+
     {% else %}
         <p class="text-center text-muted mt-4">
             Aucun service trouvé pour le moment.

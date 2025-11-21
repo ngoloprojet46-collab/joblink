@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+
+          <h2 class="text-center mb-4 text-primary fw-bold">
+            Mon Profil
+          </h2>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <div class="text-center mb-4">
+            {% if user.photo %}
+              <img src="{{ user.photo.url }}" class="rounded-circle shadow-sm" width="120" height="120">
+            {% else %}
+              <i class="bi-person-circle text-primary" style="font-size: 5rem;"></i>
+            {% endif %}
+          </div>
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <div class="d-flex justify-content-center mt-3">
+              <button type="submit" class="btn btn-success fw-semibold py-2 rounded-3">
+                Mettre à jour
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

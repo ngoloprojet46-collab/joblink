@@ -28,7 +28,7 @@ def home(request):
 # Inscription utilisateur
 def register_view(request):
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
+        form = UserRegisterForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             role = form.cleaned_data['role']
@@ -45,6 +45,27 @@ def register_view(request):
     else:
         form = UserRegisterForm()
     return render(request, 'registration/register.html', {'form': form})
+
+from django.contrib.auth.decorators import login_required
+from .forms import ProfilUpdateForm
+from django.contrib import messages
+
+@login_required
+def profil_view(request):
+    if request.method == 'POST':
+        form = ProfilUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Votre profil a été mis à jour ✅")
+            # 🔹 Redirection vers le dashboard selon le rôle
+            if request.user.role == 'prestataire':
+                return redirect('tableau_prestataire')
+            else:
+                return redirect('tableau_demandeur')
+    else:
+        form = ProfilUpdateForm(instance=request.user)
+
+    return render(request, 'profil.html', {'form': form})
 
 
 # Tableau de bord Prestataire
