@@ -11,12 +11,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Sécurité
 # -------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
-#DEBUG = True
+#DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '.onrender.com',                 # accepte tous les sous-domaines Render
+    '.onrender.com',
+    'joblink-1-b65k.onrender.com',                 # accepte tous les sous-domaines Render
     'joblink-fdot.onrender.com',     # ton lien actuel
 ]
 
