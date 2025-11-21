@@ -28,3 +28,4 @@ def redirect_after_login(request):
         return redirect('prestataire_dashboard')
     else:
         return redirect('demandeur_dashboard')
+

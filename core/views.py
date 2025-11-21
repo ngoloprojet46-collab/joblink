@@ -12,6 +12,10 @@ from .models import Service, Commande, Notification
 from core.decorators import abonnement_actif_required
 from datetime import timedelta, date
 from .models import Abonnement
+from django.contrib.auth.decorators import login_required
+from .forms import ProfilUpdateForm
+from django.contrib import messages
+
 
 # Page d'accueil
 def home(request):
@@ -46,9 +50,6 @@ def register_view(request):
         form = UserRegisterForm()
     return render(request, 'registration/register.html', {'form': form})
 
-from django.contrib.auth.decorators import login_required
-from .forms import ProfilUpdateForm
-from django.contrib import messages
 
 @login_required
 def profil_view(request):
