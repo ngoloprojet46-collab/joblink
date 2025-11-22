@@ -37,6 +37,12 @@ class ProfilUpdateForm(forms.ModelForm):
             'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
+        help_texts = {
+            'username': '',
+            'email': '',
+        }
+
+
 class CustomLoginForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={'class':'form-control'})

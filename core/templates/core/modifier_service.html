@@ -31,6 +31,25 @@
                 {{ form.image }}
             </div>
 
+            <!-- Champ vidéo -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Vidéo actuelle :</label><br>
+                {% if form.instance.video %}
+                    <video controls class="w-100 rounded mb-2" style="max-height: 200px;">
+                        <source src="{{ form.instance.video.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                {% else %}
+                    <p class="text-muted">Aucune vidéo disponible.</p>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Changer la vidéo :</label>
+                {{ form.video }}
+            </div>
+
+
             <hr>
 
             <!-- Les autres champs du formulaire -->
