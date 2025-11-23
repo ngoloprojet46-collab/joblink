@@ -64,7 +64,7 @@ class ServiceForm(forms.ModelForm):
 
     class Meta:
         model = Service
-        fields = ['titre', 'description', 'categorie', 'telephone', 'adresse', 'prix', 'image', 'video']
+        fields = ['titre', 'description', 'categorie', 'ville', 'telephone', 'adresse', 'prix', 'image', 'video']
         widgets = {
             'titre': forms.TextInput(attrs={
                 'class': 'form-control',

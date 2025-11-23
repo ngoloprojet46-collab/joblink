@@ -136,18 +136,24 @@ def redirection_dashboard(request):
 # Liste des services
 def service_list(request):
     query = request.GET.get('q')
+    ville = request.GET.get('ville')
+
+    services = Service.objects.all()
+
     if query:
-        services = Service.objects.filter(
-            titre__icontains=query
-        ) | Service.objects.filter(
-            categorie__icontains=query
+        services = services.filter(
+            Q(titre__icontains=query) | 
+            Q(categorie__icontains=query)
         )
-    else:
-        services = Service.objects.all()
+
+    if ville and ville != "":
+        services = services.filter(ville=ville)
 
     context = {
         'services': services,
         'query': query,
+        'ville': ville,
+        'villes': Service.VILLES_CI,
         'user_role': request.user.role if request.user.is_authenticated else None
     }
     return render(request, 'core/service_list.html', context)

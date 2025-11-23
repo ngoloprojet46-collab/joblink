@@ -43,20 +43,34 @@ class Demandeur(models.Model):
 
 
 class Service(models.Model):
-    prestataire = models.ForeignKey('Prestataire', on_delete=models.CASCADE, related_name='services')
+    VILLES_CI = [
+        ("Abidjan", "Abidjan"),
+        ("Bouaké", "Bouaké"),
+        ("Daloa", "Daloa"),
+        ("Yamoussoukro", "Yamoussoukro"),
+        ("San-Pédro", "San-Pédro"),
+        ("Korhogo", "Korhogo"),
+        ("Man", "Man"),
+        ("Gagnoa", "Gagnoa"),
+    ]
+
+    prestataire = models.ForeignKey(
+        'Prestataire',
+        on_delete=models.CASCADE,
+        related_name='services'
+    )
     titre = models.CharField(max_length=100)
     description = models.TextField()
     prix = models.DecimalField(max_digits=10, decimal_places=2)
     telephone = models.CharField(max_length=20, blank=True, null=True)
     adresse = models.CharField(max_length=255, blank=True, null=True)
     categorie = models.CharField(max_length=100)
+    ville = models.CharField(max_length=50, choices=VILLES_CI, default="Abidjan")
     date_publication = models.DateTimeField(auto_now_add=True)
     disponible = models.BooleanField(default=True)
-    
-    # 🖼 Image et 🎥 Vidéo optionnelles
+
     image = CloudinaryField("image", blank=True, null=True)
     video = CloudinaryField(resource_type="video", blank=True, null=True)
-
 
     def __str__(self):
         return self.titre
