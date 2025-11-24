@@ -18,14 +18,25 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from .forms import AvisForm
 from .models import Avis
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # Page d'accueil
 def home(request):
-    services = Service.objects.order_by('-date_publication')[:9]
+    services = Service.objects.order_by('-date_publication')[:6]
+    default_bg = "https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
+    # Prépare une liste de tuples (service, bg_url)
+    slides = []
+    for s in services:
+        if getattr(s, 'image') and getattr(s.image, 'url', None):
+            bg = s.image.url
+        else:
+            bg = default_bg
+        slides.append({'service': s, 'bg_url': bg})
 
-    # Si l'utilisateur n'est pas connecté, on montre moins d'infos
     context = {
+        'slides': slides,
         'services': services,
         'user_role': request.user.role if request.user.is_authenticated else None
     }
@@ -48,7 +59,7 @@ def register_view(request):
 
             login(request, user)
             messages.success(request, "Inscription réussie ! Bienvenue sur JobLink 👋🏾")
-            return redirect('dashboard')
+            return redirect('home')
     else:
         form = UserRegisterForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -460,9 +471,6 @@ def avis_admin(request):
     avis = Avis.objects.order_by('-date')  # tous les avis
     return render(request, "avis_admin.html", {"avis": avis})
 
-from django.shortcuts import redirect, get_object_or_404
-from .models import Avis
-from django.contrib.admin.views.decorators import staff_member_required
 
 @staff_member_required
 def toggle_avis(request, avis_id):

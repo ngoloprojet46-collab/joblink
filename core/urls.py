@@ -15,6 +15,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
+
     # Tableau de bord
     path('dashboard/', views.redirection_dashboard, name='dashboard'),
     path('tableau-prestataire/', views.tableau_prestataire, name='tableau_prestataire'),
@@ -70,7 +71,7 @@ urlpatterns = [
 
     path('commenter/', views.commenter, name='commenter'),
     path('avis/', views.avis_list, name='avis_list'),
-    path('commentaire/delete/<int:id>/', views.avis_delete, name='avis_delete'),
+    path('commentaire/delete/<int:avis_id>/', views.avis_delete, name='avis_delete'),
     path('commentaire/delete_all/', views.avis_delete_all, name='avis_delete_all'),
 
     path('avis/admin/', views.avis_admin, name='avis_admin'),
