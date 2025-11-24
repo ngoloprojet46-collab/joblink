@@ -417,8 +417,23 @@ def commenter(request):
 
 # Voir tous les commentaires
 def avis_list(request):
-    avis = Avis.objects.order_by('-date')
+    # Admin => voir tous les commentaires
+    if request.user.is_staff:
+        avis = Avis.objects.order_by('-date')
+    else:
+        # Utilisateur normal => voir seulement ceux qui sont publics
+        avis = Avis.objects.filter(is_public=True).order_by('-date')
+
     return render(request, "avis_list.html", {"avis": avis})
+
+
+@staff_member_required
+def toggle_public(request, avis_id):
+    avis = get_object_or_404(Avis, id=avis_id)
+    avis.is_public = not avis.is_public  # inverse l’état
+    avis.save()
+    return redirect('avis_admin')
+
 
 from django.contrib.auth.decorators import login_required
 
@@ -439,4 +454,20 @@ def avis_delete(request, avis_id):
 def avis_delete_all(request):
     Avis.objects.all().delete()
     return redirect('avis_list')
+
+@staff_member_required
+def avis_admin(request):
+    avis = Avis.objects.order_by('-date')  # tous les avis
+    return render(request, "avis_admin.html", {"avis": avis})
+
+from django.shortcuts import redirect, get_object_or_404
+from .models import Avis
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def toggle_avis(request, avis_id):
+    avis = get_object_or_404(Avis, id=avis_id)
+    avis.is_public = not avis.is_public
+    avis.save()
+    return redirect('avis')
 

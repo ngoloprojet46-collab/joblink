@@ -145,6 +145,8 @@ class Avis(models.Model):
     message = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     auteur = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    is_public = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f"{self.nom} - {self.date}"

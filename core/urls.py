@@ -73,6 +73,11 @@ urlpatterns = [
     path('commentaire/delete/<int:id>/', views.avis_delete, name='avis_delete'),
     path('commentaire/delete_all/', views.avis_delete_all, name='avis_delete_all'),
 
+    path('avis/admin/', views.avis_admin, name='avis_admin'),
+    path('avis/toggle/<int:avis_id>/', views.toggle_public, name='toggle_public'),
+    path('avis/toggle/<int:avis_id>/', views.toggle_avis, name='toggle_avis'),
+
+ 
 
 
 ]

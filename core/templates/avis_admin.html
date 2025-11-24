@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+
+    <h2 class="text-center mb-4 fw-bold text-primary">Gestion des commentaires</h2>
+
+    <div class="row g-3">
+        {% for a in avis %}
+            <div class="col-md-6">
+                <div class="card shadow-sm p-3 rounded-4 h-100">
+
+                    <h5>{{ a.nom }}</h5>
+                    <p class="text-muted small">{{ a.date|date:"d/m/Y H:i" }}</p>
+                    <p>{{ a.message }}</p>
+
+                    <!-- État -->
+                    <p>
+                        {% if a.is_public %}
+                            <span class="badge bg-success">Public</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Privé</span>
+                        {% endif %}
+                    </p>
+
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+
+                        <!-- Bouton changer visibilité -->
+                        <a href="{% url 'toggle_public' a.id %}" 
+                           class="btn btn-warning btn-sm">
+                            {% if a.is_public %}
+                                Rendre privé
+                            {% else %}
+                                Rendre public
+                            {% endif %}
+                        </a>
+
+                        <!-- Supprimer -->
+                        <a href="{% url 'avis_delete' a.id %}" 
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Supprimer ce commentaire ?');">
+                            Supprimer
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
