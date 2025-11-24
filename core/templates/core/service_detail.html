@@ -2,64 +2,67 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-lg border-0">
+    <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body">
-            <h2 class="card-title text-primary fw-bold mb-3">
+            <h2 class="card-title text-primary fw-bold mb-3 text-center">
                 <i class="bi bi-briefcase-fill"></i> {{ service.titre }}
             </h2>
 
-            <p class="text-muted mb-1">
-                <i class="bi bi-tag-fill"></i> <strong>Catégorie :</strong> {{ service.categorie }}
-            </p>
-
-            <p class="text-muted mb-1">
-                <i class="bi bi-currency-dollar"></i> <strong>Prix :</strong> {{ service.prix }} FCFA
-            </p>
-
-            <p class="text-muted mb-1">
-                <i class="bi bi-person-fill"></i> <strong>Prestataire :</strong> {{ service.prestataire.user.username }}
-            </p>
-
-            <p class="text-muted mb-4">
-                <i class="bi bi-calendar-event-fill"></i> <strong>Publié le :</strong> {{ service.date_publication|date:"d M Y" }}
-            </p>
+            <div class="row text-center text-md-start mb-4">
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <i class="bi bi-tag-fill"></i> <strong>Catégorie :</strong> {{ service.categorie }}
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <i class="bi bi-currency-dollar"></i> <strong>Prix :</strong> {{ service.prix }} FCFA
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <i class="bi bi-person-fill"></i> <strong>Prestataire :</strong> {{ service.prestataire.user.username }}
+                </div>
+                <div class="col-md-3">
+                    <i class="bi bi-calendar-event-fill"></i> <strong>Publié le :</strong> {{ service.date_publication|date:"d M Y" }}
+                </div>
+            </div>
 
             <hr>
 
-            <p class="card-text fs-5">
+            <p class="card-text fs-5 text-center text-md-start mb-4">
                 {{ service.description }}
             </p>
 
-            {% if service.disponible %}
-                <span class="badge bg-success">Disponible</span>
-            {% else %}
-                <span class="badge bg-danger">Indisponible</span>
-            {% endif %}
+            <div class="text-center mb-4">
+                {% if service.disponible %}
+                    <span class="badge bg-success fs-6 px-3 py-2">Disponible</span>
+                {% else %}
+                    <span class="badge bg-danger fs-6 px-3 py-2">Indisponible</span>
+                {% endif %}
+            </div>
 
-            <div class="mt-4">
-                <a href="{% url 'service_list' %}" class="btn btn-outline-primary">
+            <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
+                <a href="{% url 'service_list' %}" class="btn btn-outline-primary btn-lg">
                     <i class="bi bi-arrow-left"></i> Retour à la liste
                 </a>
+
                 {% if user == service.prestataire.user %}
-                    <a href="{% url 'modifier_service' service.id %}">                            
+                    <a href="{% url 'modifier_service' service.id %}" class="btn btn-warning btn-lg text-white">
                         <i class="bi bi-pencil-fill"></i> Modifier
                     </a>
-                    <a href="{% url 'supprimer_service' service.id %}">
+                    <a href="{% url 'supprimer_service' service.id %}" class="btn btn-danger btn-lg">
                         <i class="bi bi-trash-fill"></i> Supprimer
                     </a>
                 {% endif %}
 
                 {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'commander_service' service.id %}">
+                    <form method="post" action="{% url 'commander_service' service.id %}" class="d-inline">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Commander ce service</button>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-cart-check-fill"></i> Commander ce service
+                        </button>
                     </form>
                 {% else %}
-                    <p class="text-muted mt-3">
-                        <a href="{% url 'login' %}">Connectez-vous</a> pour commander ce service.
-                    </p>
+                    <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">
+                        Connectez-vous pour commander
+                    </a>
                 {% endif %}
-
             </div>
         </div>
     </div>
