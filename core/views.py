@@ -22,7 +22,7 @@ from .models import Avis
 
 # Page d'accueil
 def home(request):
-    services = Service.objects.order_by('-date_publication')[:6]
+    services = Service.objects.order_by('-date_publication')[:9]
 
     # Si l'utilisateur n'est pas connecté, on montre moins d'infos
     context = {
