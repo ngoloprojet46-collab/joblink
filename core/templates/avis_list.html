@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4 text-primary fw-bold">Commentaires des utilisateurs</h2>
+
+    {% if avis %}
+        <!-- Bouton tout supprimer (en haut) -->
+        <div class="text-end mb-3">
+            <a href="{% url 'avis_delete_all' %}" 
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Voulez-vous vraiment supprimer TOUS les commentaires ?');">
+                <i class="bi bi-trash3"></i> Supprimer tout
+            </a>
+        </div>
+
+        <div class="row g-3">
+            {% for a in avis %}
+                <div class="col-md-6">
+                    <div class="card shadow-sm rounded-4 p-3 h-100">
+
+                        <h5 class="fw-bold">{{ a.nom }}</h5>
+                        <p class="text-muted small">{{ a.date|date:"d/m/Y H:i" }}</p>
+                        <p>{{ a.message }}</p>
+
+                        <!-- Bouton supprimer -->
+                        <div class="text-end mt-2">
+                            <a href="{% url 'avis_delete' a.id %}"
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Supprimer ce commentaire ?');">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Bouton ajouter un commentaire (EN BAS) -->
+        <div class="text-center mt-4">
+            <a href="{% url 'commenter' %}" class="btn btn-primary">
+                <i class="bi bi-pencil-square"></i> Ajouter un commentaire
+            </a>
+        </div>
+
+    {% else %}
+        <p class="text-center text-muted mt-4">Aucun commentaire pour le moment.</p>
+        <div class="text-center mt-3">
+            <a href="{% url 'commenter' %}" class="btn btn-primary">Ajouter un commentaire</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

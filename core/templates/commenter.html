@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+    <h2 class="text-center mb-4 text-primary fw-bold">Commentaires</h2>
+    <p class="text-center text-muted mb-4">Partagez votre avis sur JOBLINK !</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary w-100">Commenter</button>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="{% url 'avis_list' %}" class="btn btn-outline-secondary">
+            Voir les commentaires
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -68,4 +68,11 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'),
          name='password_reset_complete'),
 
+    path('commenter/', views.commenter, name='commenter'),
+    path('avis/', views.avis_list, name='avis_list'),
+    path('commentaire/delete/<int:id>/', views.avis_delete, name='avis_delete'),
+    path('commentaire/delete_all/', views.avis_delete_all, name='avis_delete_all'),
+
+
+
 ]

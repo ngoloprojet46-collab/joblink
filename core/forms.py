@@ -94,3 +94,15 @@ class ServiceForm(forms.ModelForm):
             }),
         }
 
+
+from django import forms
+from .models import Avis
+
+class AvisForm(forms.ModelForm):
+    class Meta:
+        model = Avis
+        fields = ['nom', 'message']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre nom'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre commentaire'}),
+        }

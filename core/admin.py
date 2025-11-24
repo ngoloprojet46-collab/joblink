@@ -31,3 +31,13 @@ admin.site.register(Commande)
 admin.site.register(Paiement)
 admin.site.register(Notification)
 admin.site.register(Abonnement)
+
+from django.contrib import admin
+from .models import Avis
+
+@admin.register(Avis)
+class AvisAdmin(admin.ModelAdmin):
+    list_display = ('nom', 'message', 'date')
+    list_filter = ('date',)
+    search_fields = ('nom', 'message')
+

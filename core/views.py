@@ -15,6 +15,9 @@ from .models import Abonnement
 from django.contrib.auth.decorators import login_required
 from .forms import ProfilUpdateForm
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from .forms import AvisForm
+from .models import Avis
 
 
 # Page d'accueil
@@ -138,7 +141,8 @@ def service_list(request):
     query = request.GET.get('q')
     ville = request.GET.get('ville')
 
-    services = Service.objects.all()
+    # Trier du plus récent au plus ancien
+    services = Service.objects.all().order_by('-date_publication')
 
     if query:
         services = services.filter(
@@ -146,7 +150,7 @@ def service_list(request):
             Q(categorie__icontains=query)
         )
 
-    if ville and ville != "":
+    if ville:
         services = services.filter(ville=ville)
 
     context = {
@@ -157,7 +161,6 @@ def service_list(request):
         'user_role': request.user.role if request.user.is_authenticated else None
     }
     return render(request, 'core/service_list.html', context)
-
 
 # Détail d’un service
 def service_detail(request, pk):
@@ -396,4 +399,28 @@ def gerer_abonnement(request):
     return render(request, "core/gerer_abonnement.html", {
         "abonnement": abonnement
     })
+
+# Ajouter un commentaire
+def commenter(request):
+    form = AvisForm()
+    if request.method == "POST":
+        form = AvisForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("avis_list")
+    return render(request, "commenter.html", {"form": form})
+
+# Voir tous les commentaires
+def avis_list(request):
+    avis = Avis.objects.order_by('-date')
+    return render(request, "avis_list.html", {"avis": avis})
+
+def avis_delete(request, id):
+    avis = get_object_or_404(Avis, id=id)
+    avis.delete()
+    return redirect('avis_list')
+
+def avis_delete_all(request):
+    Avis.objects.all().delete()
+    return redirect('avis_list')
 

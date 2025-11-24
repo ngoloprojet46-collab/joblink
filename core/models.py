@@ -140,4 +140,11 @@ class Abonnement(models.Model):
     def __str__(self):
         return f"Abonnement de {self.user.username} - {'Actif' if self.actif else 'Expiré'}"
 
+class Avis(models.Model):
+    nom = models.CharField(max_length=100)
+    message = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Avis de {self.nom}"
 

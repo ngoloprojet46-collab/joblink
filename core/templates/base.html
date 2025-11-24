@@ -146,6 +146,27 @@
                 <!-- 👤 Espace utilisateur -->
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
+
+                        <!-- 📌 Menu Commentaires bien stylé -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-light" href="#" id="commentairesDropdown"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-chat-dots me-1"></i> Vos-avis
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'commenter' %}">
+                                        <i class="bi bi-pencil-square me-2"></i> Laisser un commentaire
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'avis_list' %}">
+                                        <i class="bi bi-list-stars me-2"></i> Voir les commentaires
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'dashboard' %}">
                                 Tableau de bord
