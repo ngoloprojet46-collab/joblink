@@ -144,7 +144,8 @@ class Avis(models.Model):
     nom = models.CharField(max_length=100)
     message = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
+    auteur = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"Avis de {self.nom}"
+        return f"{self.nom} - {self.date}"
 

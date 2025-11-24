@@ -402,24 +402,40 @@ def gerer_abonnement(request):
 
 # Ajouter un commentaire
 def commenter(request):
-    form = AvisForm()
     if request.method == "POST":
         form = AvisForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("avis_list")
-    return render(request, "commenter.html", {"form": form})
+            avis = form.save(commit=False)
+            if request.user.is_authenticated:
+                avis.auteur = request.user
+            avis.save()
+            return redirect('avis_list')
+    else:
+        form = AvisForm()
+    return render(request, 'commenter.html', {'form': form})
+
 
 # Voir tous les commentaires
 def avis_list(request):
     avis = Avis.objects.order_by('-date')
     return render(request, "avis_list.html", {"avis": avis})
 
-def avis_delete(request, id):
-    avis = get_object_or_404(Avis, id=id)
-    avis.delete()
-    return redirect('avis_list')
+from django.contrib.auth.decorators import login_required
 
+@login_required
+def avis_delete(request, avis_id):
+    avis = get_object_or_404(Avis, id=avis_id)
+
+    # Autoriser uniquement si :
+    # - l’utilisateur est staff (admin)
+    # - OU l’utilisateur est l’auteur du commentaire
+    if request.user.is_staff or avis.auteur == request.user:
+        avis.delete()
+        return redirect('avis_list')
+    else:
+        return HttpResponseForbidden("Vous n'avez pas le droit de supprimer ce commentaire.")
+
+@staff_member_required
 def avis_delete_all(request):
     Avis.objects.all().delete()
     return redirect('avis_list')

@@ -6,13 +6,16 @@
 
     {% if avis %}
         <!-- Bouton tout supprimer (en haut) -->
+        {% if request.user.is_staff %}
         <div class="text-end mb-3">
             <a href="{% url 'avis_delete_all' %}" 
-               class="btn btn-danger btn-sm"
-               onclick="return confirm('Voulez-vous vraiment supprimer TOUS les commentaires ?');">
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Voulez-vous vraiment supprimer TOUS les commentaires ?');">
                 <i class="bi bi-trash3"></i> Supprimer tout
             </a>
         </div>
+        {% endif %}
+
 
         <div class="row g-3">
             {% for a in avis %}
@@ -24,13 +27,15 @@
                         <p>{{ a.message }}</p>
 
                         <!-- Bouton supprimer -->
+                        {% if request.user.is_staff or a.auteur == request.user %}
                         <div class="text-end mt-2">
                             <a href="{% url 'avis_delete' a.id %}"
-                               class="btn btn-outline-danger btn-sm"
-                               onclick="return confirm('Supprimer ce commentaire ?');">
+                            class="btn btn-outline-danger btn-sm"
+                            onclick="return confirm('Supprimer ce commentaire ?');">
                                 <i class="bi bi-trash"></i> Supprimer
                             </a>
                         </div>
+                        {% endif %}
 
                     </div>
                 </div>
