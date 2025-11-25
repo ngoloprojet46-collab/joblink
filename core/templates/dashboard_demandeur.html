@@ -2,9 +2,11 @@
 {% block content %}
 
 <div class="container py-5">
-    <h2 class="mb-4 text-primary text-center fw-bold">Espace (Demandeur)</h2>
+    <h2 class="mb-4 text-primary text-center fw-bold">Espace Demandeur</h2>
 
     <div class="row">
+
+        <div class="row">
         <!-- 🧍 Profil utilisateur -->
         <div class="col-md-4">
             <div class="card shadow-sm mb-4">
@@ -26,33 +28,29 @@
 
             </div>
 
-            <!-- 🔔 Notifications récentes -->
+
+            <!-- Notifications récentes -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="text-primary mb-3">🔔 Notifications récentes</h5>
-
                     {% if notifications %}
-                        <ul class="list-group">
+                        <ul class="list-group mb-2">
                             {% for notif in notifications|slice:":3" %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center {% if not notif.lue %}bg-light{% endif %}">
                                     <div>
                                         <strong>{{ notif.message }}</strong><br>
                                         <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
                                     </div>
-
                                     {% if not notif.lue %}
                                         <a href="{% url 'marquer_notification_lue' notif.id %}" 
-                                           class="btn btn-sm btn-outline-success">
-                                            Marquer comme lue
-                                        </a>
+                                           class="btn btn-sm btn-outline-success">Marquer comme lue</a>
                                     {% else %}
                                         <span class="badge bg-success text-white">Lue</span>
                                     {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>
-
-                        <div class="text-end mt-2">
+                        <div class="text-end">
                             <a href="{% url 'mes_notifications' %}" class="btn btn-sm btn-outline-primary">
                                 Tout voir
                             </a>
@@ -64,51 +62,52 @@
             </div>
         </div>
 
-        <!-- 📦 Commandes passées -->
-        <div class="col-md-8">
+        <!-- Commandes passées -->
+        <div class="col-md-8 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="text-success mb-3">📋 Mes commandes</h5>
-
                     {% if commandes %}
-                        <table class="table table-striped align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Service</th>
-                                    <th>Prestataire</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for commande in commandes %}
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ commande.service.titre }}</td>
-                                        <td>{{ commande.service.prestataire.user.username }}</td>
-                                        <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
-                                        <td>
-                                            {% if commande.statut == 'en_attente' %}
-                                                <span class="badge bg-warning text-dark">En attente</span>
-                                            {% elif commande.statut == 'acceptee' %}
-                                                <span class="badge bg-primary">Acceptée</span>
-                                            {% elif commande.statut == 'terminee' %}
-                                                <span class="badge bg-success">Terminée</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Annulée</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <a href="{% url 'supprimer_commande' commande.id %}" 
-                                            class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Voulez-vous vraiment supprimer cette commande ? 🗑');">
-                                                Supprimer
-                                            </a>
-                                        </td>
+                                        <th>Service</th>
+                                        <th>Prestataire</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for commande in commandes %}
+                                        <tr>
+                                            <td>{{ commande.service.titre }}</td>
+                                            <td>{{ commande.service.prestataire.user.username }}</td>
+                                            <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                {% if commande.statut == 'en_attente' %}
+                                                    <span class="badge bg-warning text-dark">En attente</span>
+                                                {% elif commande.statut == 'acceptee' %}
+                                                    <span class="badge bg-primary">Acceptée</span>
+                                                {% elif commande.statut == 'terminee' %}
+                                                    <span class="badge bg-success">Terminée</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Annulée</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'supprimer_commande' commande.id %}" 
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('Supprimer cette commande ? 🗑');">
+                                                    Supprimer
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
                         <p class="text-muted">Aucune commande pour le moment.</p>
                     {% endif %}

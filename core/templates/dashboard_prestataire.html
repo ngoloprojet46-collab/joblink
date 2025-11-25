@@ -2,9 +2,12 @@
 
 {% block content %}
 <div class="container py-5">
-    <h2 class="mb-4 text-primary text-center fw-bold">Espace (Prestataire)</h2>
+    <h2 class="mb-4 text-primary text-center fw-bold">Espace Prestataire</h2>
 
     <div class="row">
+
+        <!-- Profil utilisateur -->
+        <div class="row">
         <!-- Profil utilisateur -->
         <div class="col-md-4">
             <div class="card shadow-sm mb-4">
@@ -27,41 +30,42 @@
             </div>
         </div>
 
+
         <!-- Services publiés + Commandes reçues -->
         <div class="col-md-8">
+
             <!-- Services publiés -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="text-primary mb-3">Mes services publiés</h5>
-
                     {% if services %}
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Titre</th>
-                                    <th>Prix</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for service in services %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ service.titre }}</td>
-                                        <td>{{ service.prix }} FCFA</td>
-                                        <td>{{ service.date_publication|date:"d/m/Y" }}</td>
-                                        <td>
-                                            <a href="{% url 'service_detail' service.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
-                                            <a href="{% url 'modifier_service' service.id %}" class="btn btn-warning btn-sm">Modifier</a>
-                                            <a href="{% url 'supprimer_service' service.id %}" class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Voulez-vous vraiment supprimer ce service ? 🗑');">
-                                                Supprimer
-                                            </a>
-                                        </td>
+                                        <th>Titre</th>
+                                        <th>Prix</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>                           
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for service in services %}
+                                        <tr>
+                                            <td>{{ service.titre }}</td>
+                                            <td>{{ service.prix }} FCFA</td>
+                                            <td>{{ service.date_publication|date:"d/m/Y" }}</td>
+                                            <td class="d-flex gap-2">
+                                                <a href="{% url 'service_detail' service.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
+                                                <a href="{% url 'modifier_service' service.id %}" class="btn btn-warning btn-sm text-white">Modifier</a>
+                                                <a href="{% url 'supprimer_service' service.id %}" class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('Supprimer ce service ?')">Supprimer</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
                         <p class="text-muted">Vous n'avez publié aucun service pour le moment.</p>
                     {% endif %}
@@ -72,66 +76,67 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="text-success mb-3">Commandes reçues</h5>
-
                     {% if commandes %}
-                        <table class="table table-striped align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Service</th>
-                                    <th>Client</th>
-                                    <th>Date</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for commande in commandes %}
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ commande.service.titre }}</td>
-                                        <td>{{ commande.demandeur.user.username }}</td>
-                                        <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
-                                        <td>
-                                            {% if commande.statut == 'en_attente' %}
-                                                <span class="badge bg-warning text-dark">En attente</span>
-                                            {% elif commande.statut == 'acceptee' %}
-                                                <span class="badge bg-primary">Acceptée</span>
-                                            {% elif commande.statut == 'terminee' %}
-                                                <span class="badge bg-success">Terminée</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Annulée</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="d-flex gap-2">
-                                            {% if commande.statut == 'en_attente' %}
-                                                <a href="{% url 'accepter_commande' commande.id %}" class="btn btn-sm btn-success" title="Accepter">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </a>
-                                                <a href="{% url 'annuler_commande' commande.id %}" class="btn btn-sm btn-danger" title="Refuser">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </a>
-                                            {% elif commande.statut == 'acceptee' %}
-                                                <a href="{% url 'terminer_commande' commande.id %}" class="btn btn-sm btn-primary" title="Marquer comme terminée">
-                                                    <i class="bi bi-flag"></i>
-                                                </a>
-                                            {% endif %}
-
-                                            <!-- ✅ Nouveau bouton Supprimer -->
-                                            <a href="{% url 'supprimer_commande_prestataire' commande.id %}"
-                                               class="btn btn-sm btn-outline-secondary"
-                                               onclick="return confirm('Voulez-vous vraiment supprimer cette commande reçue ? 🗑');"
-                                               title="Supprimer définitivement">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
-                                        </td>
+                                        <th>Service</th>
+                                        <th>Client</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for commande in commandes %}
+                                        <tr>
+                                            <td>{{ commande.service.titre }}</td>
+                                            <td>{{ commande.demandeur.user.username }}</td>
+                                            <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                {% if commande.statut == 'en_attente' %}
+                                                    <span class="badge bg-warning text-dark">En attente</span>
+                                                {% elif commande.statut == 'acceptee' %}
+                                                    <span class="badge bg-primary">Acceptée</span>
+                                                {% elif commande.statut == 'terminee' %}
+                                                    <span class="badge bg-success">Terminée</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Annulée</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="d-flex gap-1">
+                                                {% if commande.statut == 'en_attente' %}
+                                                    <a href="{% url 'accepter_commande' commande.id %}" class="btn btn-sm btn-success" title="Accepter">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </a>
+                                                    <a href="{% url 'annuler_commande' commande.id %}" class="btn btn-sm btn-danger" title="Refuser">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </a>
+                                                {% elif commande.statut == 'acceptee' %}
+                                                    <a href="{% url 'terminer_commande' commande.id %}" class="btn btn-sm btn-primary" title="Terminer">
+                                                        <i class="bi bi-flag"></i>
+                                                    </a>
+                                                {% endif %}
+
+                                                <a href="{% url 'supprimer_commande_prestataire' commande.id %}" 
+                                                   class="btn btn-sm btn-outline-secondary"
+                                                   onclick="return confirm('Supprimer cette commande ? 🗑');"
+                                                   title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
                         <p class="text-muted">Aucune commande reçue pour le moment.</p>
                     {% endif %}
                 </div>
             </div>
+
         </div>
     </div>
 </div>
