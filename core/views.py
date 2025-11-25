@@ -124,7 +124,7 @@ def marquer_notification_lue(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.lue = True
     notification.save()
-    return redirect('tableau_demandeur')
+    return redirect('mes_notifications')
 
 @login_required
 def tout_marquer_lu(request):
