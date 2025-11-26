@@ -150,14 +150,32 @@ class Avis(models.Model):
     def __str__(self):
         return f"{self.nom} - {self.date}"
 
+from django.db import models
+from cloudinary.models import CloudinaryField
+
 class Boutique(models.Model):
-    prestataire = models.OneToOneField(Prestataire, on_delete=models.CASCADE, related_name='boutique')
-    nom = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-    date_creation = models.DateTimeField(auto_now_add=True)
-    image = CloudinaryField("image_boutique", blank=True, null=True)
+    prestataire = models.OneToOneField(
+        'Prestataire', 
+        on_delete=models.CASCADE, 
+        related_name='boutique',
+        verbose_name="Prestataire"
+    )
+    nom = models.CharField(max_length=100, verbose_name="Nom de la boutique")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    date_creation = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    image = CloudinaryField(blank=True, null=True, verbose_name="Image de la boutique")
+
+
+
+    class Meta:
+        verbose_name = "Boutique"
+        verbose_name_plural = "Boutiques"
+        ordering = ['-date_creation']  # les plus récentes en premier
 
     def __str__(self):
-        return f"{self.nom} - {self.prestataire.user.username}"
+        # sécurité si le prestataire n'a pas de user (rare mais mieux prévenir)
+        username = getattr(self.prestataire.user, 'username', 'Prestataire inconnu')
+        return f"{self.nom} - {username}"
+
 
 
