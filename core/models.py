@@ -150,31 +150,12 @@ class Avis(models.Model):
     def __str__(self):
         return f"{self.nom} - {self.date}"
 
-from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
 class Boutique(models.Model):
-    nom = models.CharField(max_length=255)
+    prestataire = models.OneToOneField('Prestataire', on_delete=models.CASCADE, related_name='boutique')
+    nom = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='boutiques/', blank=True, null=True)
-    prestataire = models.OneToOneField(User, on_delete=models.CASCADE)  # lien avec prestataire
     date_creation = models.DateTimeField(auto_now_add=True)
+    image = CloudinaryField("image_boutique", blank=True, null=True)
 
     def __str__(self):
-        return self.nom
-
-
-    class Meta:
-        verbose_name = "Boutique"
-        verbose_name_plural = "Boutiques"
-        ordering = ['-date_creation']  # les plus récentes en premier
-
-    def __str__(self):
-        # sécurité si le prestataire n'a pas de user (rare mais mieux prévenir)
-        username = getattr(self.prestataire.user, 'username', 'Prestataire inconnu')
-        return f"{self.nom} - {username}"
-
-
-
+        return f"{self.nom} - {self.prestataire.user.username}"
