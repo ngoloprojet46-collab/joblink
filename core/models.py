@@ -151,20 +151,19 @@ class Avis(models.Model):
         return f"{self.nom} - {self.date}"
 
 from django.db import models
-from cloudinary.models import CloudinaryField
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Boutique(models.Model):
-    prestataire = models.OneToOneField(
-        'Prestataire', 
-        on_delete=models.CASCADE, 
-        related_name='boutique',
-        verbose_name="Prestataire"
-    )
-    nom = models.CharField(max_length=100, verbose_name="Nom de la boutique")
-    description = models.TextField(blank=True, null=True, verbose_name="Description")
-    date_creation = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
-    image = CloudinaryField(blank=True, null=True, verbose_name="Image de la boutique")
+    nom = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='boutiques/', blank=True, null=True)
+    prestataire = models.OneToOneField(User, on_delete=models.CASCADE)  # lien avec prestataire
+    date_creation = models.DateTimeField(auto_now_add=True)
 
+    def _str_(self):
+        return self.nom
 
 
     class Meta:
