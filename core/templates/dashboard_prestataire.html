@@ -2,42 +2,97 @@
 
 {% block content %}
 <div class="container py-5">
+
     <h2 class="mb-4 text-primary text-center fw-bold">Espace Prestataire</h2>
 
     <div class="row">
 
-        <!-- Profil utilisateur -->
-        <div class="row">
-        <!-- Profil utilisateur -->
+        <!-- ============================
+              🧑‍💼 PROFIL PRESTATAIRE
+        ============================= -->
         <div class="col-md-4">
             <div class="card shadow-sm mb-4">
                 <div class="card-body text-center">
+
                     {% if user.photo %}
                         <img src="{{ user.photo.url }}" class="rounded-circle mb-3" width="120" height="120">
                     {% else %}
                         <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
                     {% endif %}
+
                     <h5 class="mt-2">{{ user.username }}</h5>
                     <p class="text-muted">{{ user.email }}</p>
-                    <a href="{% url 'profil' %}" class="btn btn-primary btn-sm mt-2">
-                        <i class="bi bi-person-circle"></i> Voir mon profil
-                    </a>
 
-                    <a href="{% url 'add_service' %}" class="btn btn-primary btn-sm mt-2">
-                        <i class="bi bi-plus-circle me-1"></i> Publier un service
-                    </a>
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'profil' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-person-circle me-1"></i> Voir mon profil
+                        </a>
+
+                        <a href="{% url 'add_service' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i> Publier un service
+                        </a>
+                    </div>
+
                 </div>
             </div>
+
+            <!-- Boutons Boutique -->
+            <div class="d-grid gap-2 mb-4">
+
+                {% if request.user.prestataire %}
+                    {% if request.user.prestataire.boutique %}
+                        <a 
+                           class="btn btn-outline-secondary">
+                           
+                        </a>
+
+                        <a href="{% url 'detail_boutique' request.user.prestataire.boutique.id %}" 
+                            class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
+                            style="
+                                background: linear-gradient(90deg, #4e54c8, #8f94fb);
+                                transition: transform 0.2s, box-shadow 0.2s;
+                            "
+                            onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
+                                <i class="bi bi-shop me-2"></i>  Ma boutique
+                        </a>
+                        <a href="{% url 'modifier_boutique' %}"
+                           class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
+                           style="
+                            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+                            transition: transform 0.2s, box-shadow 0.2s;
+                             "
+                            onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
+                               <i class="bi bi-pencil-square me-2"></i> Modifier la boutique
+                        </a>
+
+
+                        <a href="{% url 'modifier_boutique' %}"
+                           class="btn btn-outline-secondary">
+                            
+                        </a>
+                    {% else %}
+                        <a href="{% url 'creer_boutique' %}" class="btn btn-success">
+                            Créer ma boutique
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
         </div>
 
-
-        <!-- Services publiés + Commandes reçues -->
+        <!-- ============================
+              📦 SERVICES & COMMANDES
+        ============================= -->
         <div class="col-md-8">
 
-            <!-- Services publiés -->
+            <!-- ==== Services publiés ==== -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
+
                     <h5 class="text-primary mb-3">Mes services publiés</h5>
+
                     {% if services %}
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
@@ -56,10 +111,21 @@
                                             <td>{{ service.prix }} FCFA</td>
                                             <td>{{ service.date_publication|date:"d/m/Y" }}</td>
                                             <td class="d-flex gap-2">
-                                                <a href="{% url 'service_detail' service.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
-                                                <a href="{% url 'modifier_service' service.id %}" class="btn btn-warning btn-sm text-white">Modifier</a>
-                                                <a href="{% url 'supprimer_service' service.id %}" class="btn btn-danger btn-sm"
-                                                   onclick="return confirm('Supprimer ce service ?')">Supprimer</a>
+                                                <a href="{% url 'service_detail' service.pk %}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Voir
+                                                </a>
+
+                                                <a href="{% url 'modifier_service' service.id %}"
+                                                   class="btn btn-warning btn-sm text-white">
+                                                    Modifier
+                                                </a>
+
+                                                <a href="{% url 'supprimer_service' service.id %}"
+                                                   class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('Supprimer ce service ?')">
+                                                    Supprimer
+                                                </a>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -69,13 +135,16 @@
                     {% else %}
                         <p class="text-muted">Vous n'avez publié aucun service pour le moment.</p>
                     {% endif %}
+
                 </div>
             </div>
 
-            <!-- Commandes reçues -->
+            <!-- ==== Commandes reçues ==== -->
             <div class="card shadow-sm">
                 <div class="card-body">
+
                     <h5 class="text-success mb-3">Commandes reçues</h5>
+
                     {% if commandes %}
                         <div class="table-responsive">
                             <table class="table table-striped align-middle mb-0">
@@ -94,6 +163,7 @@
                                             <td>{{ commande.service.titre }}</td>
                                             <td>{{ commande.demandeur.user.username }}</td>
                                             <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+
                                             <td>
                                                 {% if commande.statut == 'en_attente' %}
                                                     <span class="badge bg-warning text-dark">En attente</span>
@@ -105,35 +175,48 @@
                                                     <span class="badge bg-danger">Annulée</span>
                                                 {% endif %}
                                             </td>
+
                                             <td class="d-flex gap-1">
+
                                                 {% if commande.statut == 'en_attente' %}
-                                                    <a href="{% url 'accepter_commande' commande.id %}" class="btn btn-sm btn-success" title="Accepter">
+                                                    <a href="{% url 'accepter_commande' commande.id %}"
+                                                       class="btn btn-sm btn-success"
+                                                       title="Accepter">
                                                         <i class="bi bi-check-circle"></i>
                                                     </a>
-                                                    <a href="{% url 'annuler_commande' commande.id %}" class="btn btn-sm btn-danger" title="Refuser">
+
+                                                    <a href="{% url 'annuler_commande' commande.id %}"
+                                                       class="btn btn-sm btn-danger"
+                                                       title="Refuser">
                                                         <i class="bi bi-x-circle"></i>
                                                     </a>
+
                                                 {% elif commande.statut == 'acceptee' %}
-                                                    <a href="{% url 'terminer_commande' commande.id %}" class="btn btn-sm btn-primary" title="Terminer">
+                                                    <a href="{% url 'terminer_commande' commande.id %}"
+                                                       class="btn btn-sm btn-primary"
+                                                       title="Terminer">
                                                         <i class="bi bi-flag"></i>
                                                     </a>
                                                 {% endif %}
 
-                                                <a href="{% url 'supprimer_commande_prestataire' commande.id %}" 
+                                                <a href="{% url 'supprimer_commande_prestataire' commande.id %}"
                                                    class="btn btn-sm btn-outline-secondary"
                                                    onclick="return confirm('Supprimer cette commande ? 🗑');"
                                                    title="Supprimer">
                                                     <i class="bi bi-trash"></i>
                                                 </a>
+
                                             </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
+
                     {% else %}
                         <p class="text-muted">Aucune commande reçue pour le moment.</p>
                     {% endif %}
+
                 </div>
             </div>
 

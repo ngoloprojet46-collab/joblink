@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-primary">{{ boutique.nom }}</h2>
+  <p>{{ boutique.description }}</p>
+  {% if boutique.image %}
+    <img src="{{ boutique.image.url }}" class="img-fluid mb-4 rounded" 
+        style="max-height: 400px; width: 100%; object-fit: cover;">
+  {% endif %}
+
+  <h4 class="text-center text-primary mb-4" style="font-size: 2rem; font-weight: 600;">
+    Services de cette boutique :
+</h4>
+
+  <div class="row">
+    {% for service in services %}
+      <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+          {% if service.image %}
+            <img src="{{ service.image.url }}" class="img-fluid mb-3 rounded" 
+                style="max-height: 300px; width: 100%; object-fit: cover;">
+          {% else %}
+            <!-- Image par défaut -->
+            <img src="https://res.cloudinary.com/dxndciemg/image/upload/v1764081730/deyjsygu8d41iqbftx0y.jpg" 
+                 class="img-fluid mb-3 rounded" style="max-height: 300px; width: 100%; object-fit: cover;">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ service.titre }}</h5>
+            <p class="card-text">{{ service.prix }} FCFA</p>
+            <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm">Voir le service</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>Aucun service pour le moment.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

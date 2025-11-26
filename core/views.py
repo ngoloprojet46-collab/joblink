@@ -65,6 +65,112 @@ def register_view(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
+
+
+@login_required
+def creer_boutique(request):
+    # Seuls les prestataires peuvent créer une boutique
+    if not hasattr(request.user, 'prestataire'):
+        messages.error(request, "Seuls les prestataires peuvent créer une boutique.")
+        return redirect('home')
+
+    # Vérifie si le prestataire a déjà une boutique
+    if hasattr(request.user.prestataire, 'boutique'):
+        messages.info(request, "Vous avez déjà une boutique.")
+        return redirect('modifier_boutique')
+
+    if request.method == 'POST':
+        form = BoutiqueForm(request.POST, request.FILES)
+        if form.is_valid():
+            boutique = form.save(commit=False)
+            boutique.prestataire = request.user.prestataire
+            boutique.save()
+            messages.success(request, "Votre boutique a été créée avec succès ✅")
+            return redirect('detail_boutique', boutique.id)
+    else:
+        form = BoutiqueForm()
+
+    return render(request, 'core/creer_boutique.html', {'form': form})
+
+
+
+@login_required
+def creer_boutique(request):
+    # Seuls les prestataires peuvent créer une boutique
+    if not hasattr(request.user, 'prestataire'):
+        messages.error(request, "Seuls les prestataires peuvent créer une boutique.")
+        return redirect('home')
+
+    # Vérifie si le prestataire a déjà une boutique
+    if hasattr(request.user.prestataire, 'boutique'):
+        messages.info(request, "Vous avez déjà une boutique.")
+        return redirect('modifier_boutique')
+
+    if request.method == 'POST':
+        form = BoutiqueForm(request.POST, request.FILES)
+        if form.is_valid():
+            boutique = form.save(commit=False)
+            boutique.prestataire = request.user.prestataire
+            boutique.save()
+            messages.success(request, "Votre boutique a été créée avec succès ✅")
+            return redirect('detail_boutique', boutique.id)
+    else:
+        form = BoutiqueForm()
+
+    return render(request, 'core/creer_boutique.html', {'form': form})
+
+from django.shortcuts import render
+from .models import Boutique
+
+def boutiques_list(request):
+    boutiques = Boutique.objects.all()
+    return render(request, 'core/boutiques_list.html', {'boutiques': boutiques})
+
+from .models import Service
+
+def boutique_detail(request, boutique_id):
+    boutique = Boutique.objects.get(id=boutique_id)
+    services = Service.objects.filter(boutique=boutique)
+    return render(request, 'core/boutique_detail.html', {'boutique': boutique, 'services': services})
+
+def detail_boutique(request, boutique_id):
+    boutique = get_object_or_404(Boutique, id=boutique_id)
+    services = Service.objects.filter(prestataire=boutique.prestataire)
+
+    return render(request, "core/detail_boutique.html", {
+        "boutique": boutique,
+        "services": services
+    })
+
+
+    return render(request, 'boutique/detail_boutique.html', context)
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Boutique
+from .forms import BoutiqueForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def modifier_boutique(request):
+    try:
+        boutique = Boutique.objects.get(prestataire=request.user.prestataire)
+    except Boutique.DoesNotExist:
+        return redirect('creer_boutique')
+
+    if request.method == 'POST':
+        form = BoutiqueForm(request.POST, request.FILES, instance=boutique)
+        if form.is_valid():
+            form.save()
+            return redirect('detail_boutique', boutique.id)
+    else:
+        form = BoutiqueForm(instance=boutique)
+
+    return render(request, 'core/modifier_boutique.html', {'form': form})
+
+
+
 @login_required
 def profil_view(request):
     if request.method == 'POST':
@@ -420,7 +526,7 @@ def commenter(request):
             if request.user.is_authenticated:
                 avis.auteur = request.user
             avis.save()
-            return redirect('avis_list')
+            return redirect('avis_merci')
     else:
         form = AvisForm()
     return render(request, 'commenter.html', {'form': form})
@@ -478,4 +584,7 @@ def toggle_avis(request, avis_id):
     avis.is_public = not avis.is_public
     avis.save()
     return redirect('avis')
+
+def avis_merci(request):
+    return render(request, "avis_merci.html")
 

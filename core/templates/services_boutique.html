@@ -1,0 +1,8 @@
+<h2>Services de la boutique {{ boutique.nom }}</h2>
+<ul>
+{% for service in services %}
+    <li>{{ service.nom }} - {{ service.prix }}€</li>
+{% empty %}
+    <li>Aucun service disponible dans cette boutique.</li>
+{% endfor %}
+</ul>

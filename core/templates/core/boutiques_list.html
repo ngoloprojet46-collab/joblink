@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4 text-primary fw-bold">Toutes les Boutiques</h2>
+    <div class="row g-4">
+        {% for boutique in boutiques %}
+        <div class="col-md-4">
+            <div class="card shadow-sm rounded-4 p-3 text-center">
+                <h5 class="fw-bold">{{ boutique.nom }}</h5>
+                <p>{{ boutique.description|truncatechars:50 }}</p>
+                <a href="{% url 'boutique_detail' boutique.id %}" class="btn btn-primary btn-sm">
+                    Voir les services
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -77,8 +77,14 @@ urlpatterns = [
     path('avis/admin/', views.avis_admin, name='avis_admin'),
     path('avis/toggle/<int:avis_id>/', views.toggle_public, name='toggle_public'),
     path('avis/toggle/<int:avis_id>/', views.toggle_avis, name='toggle_avis'),
+    path('avis/merci/', views.avis_merci, name='avis_merci'),
 
- 
+
+    path('boutique/creer/', views.creer_boutique, name='creer_boutique'),
+    path('boutique/modifier/', views.modifier_boutique, name='modifier_boutique'),
+    path('boutique/<int:boutique_id>/', views.detail_boutique, name='detail_boutique'),
+    path('boutiques/', views.boutiques_list, name='boutiques_list'),
+    path('boutique/<int:boutique_id>/', views.boutique_detail, name='boutique_detail'),
 
 
 ]

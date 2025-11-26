@@ -107,10 +107,23 @@
         {% endif %}
     </div>
 </section>
+
+<div class="text-center my-5">
+    <a href="{% url 'boutiques_list' %}" 
+       class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
+       style="
+           background: linear-gradient(90deg, #4e54c8, #8f94fb);
+           transition: transform 0.2s, box-shadow 0.2s;
+       "
+       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
+        <i class="bi bi-shop me-2"></i> Voir les boutiques
+    </a>
+</div>
+
 <!-- 🎯 CARROUSEL PUBLICITAIRE AUTOMATIQUE — Correction Django-safe -->
-<section class="pub-section mt-3">
+<section class="pub-section mt-2">
   <div class="container">
-    <h2 class="text-center mb-4 text-primary fw-bold">Espace Publicitaire</h2>
 
 
     <div id="pubCarousel" class="carousel slide shadow-lg rounded-3 overflow-hidden"
@@ -148,6 +161,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- Section des services récents -->
 <section class="mt-5">

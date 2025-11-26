@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4 text-primary fw-bold">{{ boutique.nom }}</h2>
+    <p class="text-center">{{ boutique.description }}</p>
+    <div class="row g-4">
+        {% for service in services %}
+        <div class="col-md-4">
+            <div class="card shadow-sm rounded-4 p-3 text-center">
+                <h5 class="fw-bold">{{ service.nom }}</h5>
+                <p>{{ service.description|truncatechars:60 }}</p>
+                <p class="fw-bold text-success">{{ service.prix }} CFA</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

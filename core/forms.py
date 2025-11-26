@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 from .models import Service
+from django import forms
+
+
 
 
 class UserRegisterForm(UserCreationForm):
@@ -96,7 +99,7 @@ class ServiceForm(forms.ModelForm):
 
 
 from django import forms
-from .models import Avis
+from .models import Avis, Boutique
 
 class AvisForm(forms.ModelForm):
     class Meta:
@@ -106,3 +109,14 @@ class AvisForm(forms.ModelForm):
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre nom'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre commentaire'}),
         }
+
+class BoutiqueForm(forms.ModelForm):
+    class Meta:
+        model = Boutique
+        fields = ['nom', 'description', 'image']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de la boutique'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description de la boutique'}),
+        }
+
+
