@@ -162,7 +162,7 @@ class Boutique(models.Model):
     prestataire = models.OneToOneField(User, on_delete=models.CASCADE)  # lien avec prestataire
     date_creation = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.nom
 
 
