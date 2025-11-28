@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-4">
+    <h3 class="fw-bold mb-4 text-primary">
+        <i class="bi bi-bell"></i> Mes notifications
+    </h3>
+
+    {% if notifications %}
+        {% for notif in notifications %}
+            <div class="alert alert-secondary shadow-sm rounded-4 d-flex justify-content-between align-items-center">
+                <div>
+                    {{ notif.message|linebreaksbr }}
+                    <br>
+                    <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+                </div>
+
+                <a href="{% url 'supprimer_notification_prestataire' notif.id %}" 
+                   class="btn btn-sm btn-danger rounded-pill">
+                    Supprimer
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">Aucune notification enregistrée.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

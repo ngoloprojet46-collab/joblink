@@ -195,16 +195,22 @@ def tableau_prestataire(request):
     try:
         prestataire = Prestataire.objects.get(user=request.user)
     except Prestataire.DoesNotExist:
-        messages.error(request, "Aucun profil prestataire trouvé.")
+        messages.error(request, "Profil prestataire introuvable.")
         return redirect('home')
 
     services = Service.objects.filter(prestataire=prestataire)
     commandes = Commande.objects.filter(service__prestataire=prestataire)
 
+    # 🔥 récupérer uniquement LA DERNIÈRE notification
+    derniere_notification = Notification.objects.filter(
+        user=request.user
+    ).order_by('-date').first()
+
     context = {
         'prestataire': prestataire,
         'services': services,
         'commandes': commandes,
+        'derniere_notification': derniere_notification,
     }
     return render(request, 'dashboard_prestataire.html', context)
 
@@ -376,27 +382,71 @@ def commander_service(request, service_id):
 def accepter_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
 
-    # Vérifie que c’est bien le prestataire du service qui accepte
-    if commande.service.prestataire.user == request.user:
-        commande.statut = 'acceptee'
-        commande.save()
+    # Vérifie que c’est bien le prestataire
+    if commande.service.prestataire.user != request.user:
+        messages.error(request, "Action non autorisée.")
+        return redirect('tableau_prestataire')
 
-        # ✅ Création d'une notification pour le demandeur (avec lien prestataire)
-        Notification.objects.create(
-            user=commande.demandeur.user,  # destinataire = demandeur
-            prestataire=commande.service.prestataire,  # 🔗 lien vers le prestataire
-            message=(
-                f"Votre commande pour le service « {commande.service.titre} » a été acceptée ! 🎉\n"
-                f"Vous pouvez contacter le prestataire : {commande.service.prestataire.user.username} "
-                f"au {commande.service.prestataire.telephone}."
-            )
+    commande.statut = 'acceptee'
+    commande.save()
+
+    demandeur_user = commande.demandeur.user
+
+    # 🔥 Téléphone du demandeur
+    numero_demandeur = demandeur_user.phone if demandeur_user.phone else "Numéro non renseigné"
+
+    # 🔥 Notification envoyée au prestataire
+    Notification.objects.create(
+        user=commande.service.prestataire.user,   # destinataire = prestataire
+        prestataire=commande.service.prestataire,
+        message=(
+            f"Nouvelle commande acceptée pour le service « {commande.service.titre} ».\n"
+            f"Le demandeur : {demandeur_user.username}\n"
+            f"Téléphone : {numero_demandeur}"
         )
+    )
 
-        messages.success(request, "Commande acceptée et notification envoyée au demandeur ✅")
-    else:
-        messages.error(request, "Vous n'êtes pas autorisé à accepter cette commande ❌")
+    # 🔥 Notification envoyée au demandeur (déjà existante chez toi)
+    Notification.objects.create(
+        user=demandeur_user,
+        prestataire=commande.service.prestataire,
+        message=(
+            f"Votre commande pour « {commande.service.titre} » a été acceptée !\n"
+            f"Contactez le prestataire au : {commande.service.prestataire.telephone}"
+        )
+    )
 
-    return redirect('dashboard')
+    messages.success(request, "Commande acceptée et notifications envoyées.")
+    return redirect('tableau_prestataire')
+
+@login_required
+def liste_notifications_prestataire(request):
+    # 🔥 Récupérer uniquement les notifications destinées au prestataire connecté
+    notifications = Notification.objects.filter(
+        user=request.user,  # destinataire = l'utilisateur connecté
+        prestataire__user=request.user  # facultatif si tu veux t'assurer que c'est bien un prestataire
+    ).order_by('-date')
+
+    context = {
+        'notifications': notifications
+    }
+    return render(request, 'liste_notifications_prestataire.html', context)
+
+@login_required
+def supprimer_notification_prestataire(request, notif_id):
+    try:
+        prestataire = Prestataire.objects.get(user=request.user)
+    except Prestataire.DoesNotExist:
+        messages.error(request, "Vous n'êtes pas prestataire.")
+        return redirect('dashboard')
+
+    notif = get_object_or_404(Notification, id=notif_id, prestataire=prestataire)
+    notif.delete()
+
+    messages.success(request, "Notification supprimée ✔")
+    return redirect('liste_notifications_prestataire')
+
+
 
 @login_required
 def mes_notifications(request):

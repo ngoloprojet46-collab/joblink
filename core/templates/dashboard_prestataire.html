@@ -79,8 +79,28 @@
                     {% endif %}
                 {% endif %}
             </div>
-
+            
         </div>
+
+       <div class="col-md-4">
+            {% if derniere_notification %}
+            <div class="alert alert-info shadow-sm mb-4 rounded-4">
+                <h5 class="fw-bold">
+                    <i class="bi bi-bell-fill text-primary"></i> Nouvelle notification
+                </h5>
+                <p class="mb-1">{{ derniere_notification.message|linebreaksbr }}</p>
+                <small class="text-muted">{{ derniere_notification.date|date:"d/m/Y H:i" }}</small>
+
+                <div class="mt-3">
+                    <a href="{% url 'liste_notifications_prestataire' %}" class="btn btn-sm btn-primary rounded-pill">
+                        Voir tout
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+
 
         <!-- ============================
               📦 SERVICES & COMMANDES

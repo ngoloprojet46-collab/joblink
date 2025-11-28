@@ -86,5 +86,8 @@ urlpatterns = [
     path('boutiques/', views.boutiques_list, name='boutiques_list'),
     path('boutique/<int:boutique_id>/', views.boutique_detail, name='boutique_detail'),
 
+     # Notifications Prestataire
+    path('prestataire/notifications/', views.liste_notifications_prestataire, name='liste_notifications_prestataire'),
+    path('prestataire/notifications/<int:notif_id>/supprimer/', views.supprimer_notification_prestataire, name='supprimer_notification_prestataire'),
 
 ]
