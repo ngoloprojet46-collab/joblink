@@ -638,3 +638,35 @@ def toggle_avis(request, avis_id):
 def avis_merci(request):
     return render(request, "avis_merci.html")
 
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
+
+User = get_user_model()
+
+def reset_password(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if password1 != password2:
+            messages.error(request, "Les mots de passe ne correspondent pas.")
+            return redirect('reset_password')
+
+        try:
+            user = User.objects.get(email=email)
+            user.password = make_password(password1)  # hash le mot de passe
+            user.save()
+            messages.success(request, "Mot de passe réinitialisé avec succès !")
+            return redirect('login')  # redirige vers la page de connexion
+        except User.DoesNotExist:
+            messages.error(request, "Utilisateur introuvable avec cet email.")
+            return redirect('reset_password')
+
+    return render(request, 'core/reset_password.html')
+
+

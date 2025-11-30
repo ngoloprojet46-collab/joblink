@@ -120,3 +120,23 @@ class BoutiqueForm(forms.ModelForm):
         }
 
 
+from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import SetPasswordForm
+
+class ResetPasswordForm(forms.Form):
+    username = forms.CharField(label="Nom d'utilisateur")
+    new_password1 = forms.CharField(widget=forms.PasswordInput, label="Nouveau mot de passe")
+    new_password2 = forms.CharField(widget=forms.PasswordInput, label="Confirmer le mot de passe")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pwd1 = cleaned_data.get("new_password1")
+        pwd2 = cleaned_data.get("new_password2")
+
+        if pwd1 != pwd2:
+            raise forms.ValidationError("Les mots de passe ne correspondent pas")
+        
+        return cleaned_data
+
+

@@ -159,3 +159,5 @@ class Boutique(models.Model):
 
     def __str__(self):
         return f"{self.nom} - {self.prestataire.user.username}"
+
+

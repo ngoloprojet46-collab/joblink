@@ -6,6 +6,8 @@ from . import views_admin
 
 urlpatterns = [
     
+    path('reset-password/', views.reset_password, name='reset_password'),
+
     path('admin-dashboard/', views_admin.admin_dashboard, name='admin_dashboard'),
 
     path('profil/', profil_view, name='profil'),
