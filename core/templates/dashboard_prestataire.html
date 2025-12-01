@@ -86,7 +86,7 @@
             {% if derniere_notification %}
             <div class="alert alert-info shadow-sm mb-4 rounded-4">
                 <h5 class="fw-bold">
-                    <i class="bi bi-bell-fill text-primary"></i> Nouvelle notification
+                    <i class="bi text-center bi-bell-fill text-primary"></i> Nouvelle notification
                 </h5>
                 <p class="mb-1">{{ derniere_notification.message|linebreaksbr }}</p>
                 <small class="text-muted">{{ derniere_notification.date|date:"d/m/Y H:i" }}</small>
@@ -111,7 +111,7 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
 
-                    <h5 class="text-primary mb-3">Mes services publiés</h5>
+                    <h5 class="text-center text-primary mb-3">Mes services publiés</h5>
 
                     {% if services %}
                         <div class="table-responsive">
@@ -163,7 +163,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
 
-                    <h5 class="text-success mb-3">Commandes reçues</h5>
+                    <h5 class="text-center text-success mb-3">Commandes reçues</h5>
 
                     {% if commandes %}
                         <div class="table-responsive">
