@@ -1,18 +1,29 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-center mb-4 text-primary fw-bold">Toutes les Boutiques</h2>
+    <h2 class="mb-4">Toutes les boutiques</h2>
+
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher une boutique..." value="{{ query|default:'' }}">
+            <button class="btn btn-primary" type="submit">Rechercher</button>
+        </div>
+    </form>
+
     <div class="row g-4">
         {% for boutique in boutiques %}
         <div class="col-md-4">
-            <div class="card shadow-sm rounded-4 p-3 text-center">
-                <h5 class="fw-bold">{{ boutique.nom }}</h5>
-                <p>{{ boutique.description|truncatechars:50 }}</p>
-                <a href="{% url 'boutique_detail' boutique.id %}" class="btn btn-primary btn-sm">
-                    Voir les services
-                </a>
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-body">
+                    <h4 class="fw-bold">{{ boutique.nom }}</h4>
+                    <p>{{ boutique.description|truncatechars:100 }}</p>
+                    <a href="{% url 'detail_boutique' boutique.id %}" class="btn btn-outline-primary">Voir Boutique</a>
+                </div>
             </div>
         </div>
+        {% empty %}
+        <p>Aucune boutique trouvée.</p>
         {% endfor %}
     </div>
 </div>

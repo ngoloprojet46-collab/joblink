@@ -20,11 +20,15 @@ from .forms import AvisForm
 from .models import Avis
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
+from .models import Boutique
+from .forms import BoutiqueForm
+
+
 
 
 # Page d'accueil
 def home(request):
-    services = Service.objects.order_by('-date_publication')[:6]
+    services = Service.objects.order_by('-date_publication')[:9]
     default_bg = "https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
     # Prépare une liste de tuples (service, bg_url)
     slides = []
@@ -93,40 +97,14 @@ def creer_boutique(request):
     return render(request, 'core/creer_boutique.html', {'form': form})
 
 
-
-@login_required
-def creer_boutique(request):
-    # Seuls les prestataires peuvent créer une boutique
-    if not hasattr(request.user, 'prestataire'):
-        messages.error(request, "Seuls les prestataires peuvent créer une boutique.")
-        return redirect('home')
-
-    # Vérifie si le prestataire a déjà une boutique
-    if hasattr(request.user.prestataire, 'boutique'):
-        messages.info(request, "Vous avez déjà une boutique.")
-        return redirect('modifier_boutique')
-
-    if request.method == 'POST':
-        form = BoutiqueForm(request.POST, request.FILES)
-        if form.is_valid():
-            boutique = form.save(commit=False)
-            boutique.prestataire = request.user.prestataire
-            boutique.save()
-            messages.success(request, "Votre boutique a été créée avec succès ✅")
-            return redirect('detail_boutique', boutique.id)
-    else:
-        form = BoutiqueForm()
-
-    return render(request, 'core/creer_boutique.html', {'form': form})
-
-from django.shortcuts import render
-from .models import Boutique
-
 def boutiques_list(request):
-    boutiques = Boutique.objects.all()
-    return render(request, 'core/boutiques_list.html', {'boutiques': boutiques})
+    query = request.GET.get('q')  # On récupère le paramètre 'q' dans l'URL
+    if query:
+        boutiques = Boutique.objects.filter(nom__icontains=query)  # Recherche insensible à la casse
+    else:
+        boutiques = Boutique.objects.all()
+    return render(request, 'core/boutiques_list.html', {'boutiques': boutiques, 'query': query})
 
-from .models import Service
 
 def boutique_detail(request, boutique_id):
     boutique = Boutique.objects.get(id=boutique_id)
@@ -146,11 +124,6 @@ def detail_boutique(request, boutique_id):
     return render(request, 'boutique/detail_boutique.html', context)
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Boutique
-from .forms import BoutiqueForm
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def modifier_boutique(request):
