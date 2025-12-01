@@ -11,7 +11,16 @@
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                {{ form.as_p }}
+                <!-- Champ Catégorie -->
+                <div class="mb-3">
+                    <label for="id_categorie" class="form-label fw-bold">Type de boutique</label>
+                    {{ form.categorie }}
+                </div>
+
+                <!-- Affichage des autres champs automatiquement -->
+                {{ form.nom }}
+                {{ form.description }}
+                {{ form.image }}
 
                 <div class="d-grid mt-3">
                     <button type="submit" class="btn btn-success">

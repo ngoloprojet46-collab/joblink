@@ -113,7 +113,7 @@ class AvisForm(forms.ModelForm):
 class BoutiqueForm(forms.ModelForm):
     class Meta:
         model = Boutique
-        fields = ['nom', 'description', 'image']
+        fields = ['nom', 'description', 'categorie', 'image']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de la boutique'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description de la boutique'}),

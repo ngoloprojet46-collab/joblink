@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-center text-primary fw-bold mb-4">Boutiques d'offres d'emploi</h2>
+
+<!-- Barre de recherche -->
+<form method="GET" class="mb-4 text-center">
+    <input type="text" name="q" class="form-control w-50 d-inline-block"
+           placeholder="Rechercher une boutique..."
+           value="{{ request.GET.q }}">
+    <button class="btn btn-primary">Rechercher</button>
+</form>
+
+<div class="row g-4">
+    {% for boutique in boutiques %}
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="text-center card-body">
+                <h4>{{ boutique.nom }}</h4>
+                <p>{{ boutique.description|truncatechars:120 }}</p>
+                <a href="{% url 'detail_boutique' boutique.id %}" class="btn btn-primary">Voir Boutique</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>Aucune boutique trouvée.</p>
+    {% endfor %}
+</div>
+{% endblock %}

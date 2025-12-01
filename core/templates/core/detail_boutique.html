@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container my-5">
-  <h2 class="text-primary">{{ boutique.nom }}</h2>
-  <p>{{ boutique.description }}</p>
+  <h2 class="text-center text-primary">{{ boutique.nom }}</h2>
+  <p class="text-center">{{ boutique.description }}</p>
   {% if boutique.image %}
     <img src="{{ boutique.image.url }}" class="img-fluid mb-4 rounded" 
         style="max-height: 400px; width: 100%; object-fit: cover;">

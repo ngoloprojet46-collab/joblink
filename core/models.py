@@ -151,13 +151,18 @@ class Avis(models.Model):
         return f"{self.nom} - {self.date}"
 
 class Boutique(models.Model):
-    prestataire = models.OneToOneField('Prestataire', on_delete=models.CASCADE, related_name='boutique')
-    nom = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-    date_creation = models.DateTimeField(auto_now_add=True)
+    CATEGORIES = [
+        ("emploi", "Boutique d'emploi"),
+        ("vente", "Boutique de vente"),
+    ]
+
+    prestataire = models.OneToOneField(Prestataire, on_delete=models.CASCADE)
+    nom = models.CharField(max_length=255)
+    description = models.TextField()
+    categorie = models.CharField(max_length=20, choices=CATEGORIES, default="emploi")
+    # <-- remplace ImageField par CloudinaryField
     image = CloudinaryField("image_boutique", blank=True, null=True)
+    date_creation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.nom} - {self.prestataire.user.username}"
-
-
+        return self.nom

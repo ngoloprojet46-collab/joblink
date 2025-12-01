@@ -69,8 +69,6 @@ def register_view(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
-
-
 @login_required
 def creer_boutique(request):
     # Seuls les prestataires peuvent créer une boutique
@@ -96,14 +94,28 @@ def creer_boutique(request):
 
     return render(request, 'core/creer_boutique.html', {'form': form})
 
+from django.shortcuts import render
+from .models import Boutique
 
-def boutiques_list(request):
-    query = request.GET.get('q')  # On récupère le paramètre 'q' dans l'URL
+def boutiques_emploi(request):
+    query = request.GET.get('q')
+    boutiques = Boutique.objects.filter(categorie="emploi")
+
     if query:
-        boutiques = Boutique.objects.filter(nom__icontains=query)  # Recherche insensible à la casse
-    else:
-        boutiques = Boutique.objects.all()
-    return render(request, 'core/boutiques_list.html', {'boutiques': boutiques, 'query': query})
+        boutiques = boutiques.filter(nom__icontains=query)
+
+    return render(request, "core/boutiques_emploi.html", {"boutiques": boutiques})
+
+
+def boutiques_vente(request):
+    query = request.GET.get('q')
+    boutiques = Boutique.objects.filter(categorie="vente")
+
+    if query:
+        boutiques = boutiques.filter(nom__icontains=query)
+
+    return render(request, "core/boutiques_vente.html", {"boutiques": boutiques})
+
 
 
 def boutique_detail(request, boutique_id):
