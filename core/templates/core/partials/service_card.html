@@ -1,0 +1,41 @@
+<div class="col-md-4 mb-4">
+    <div class="card h-100 shadow-sm border-0">
+
+        <!-- Image ou vidéo -->
+        {% if service.image %}
+            <img src="{{ service.image.url }}" 
+                 class="card-img-top rounded-top"
+                 alt="Image du service"
+                 style="height: 200px; object-fit: cover; border-radius: 12px;">
+        {% elif service.video %}
+            <video class="card-img-top rounded-top"
+                   style="height: 200px; object-fit: cover; border-radius: 12px;"
+                   controls>
+                <source src="{{ service.video.url }}" type="video/mp4">
+                Votre navigateur ne supporte pas la vidéo.
+            </video>
+        {% else %}
+            <img src="https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
+                class="card-img-top rounded-top"
+                alt="Aucun média disponible"
+                style="height: 200px; object-fit: cover; border-radius: 12px;">
+        {% endif %}
+
+        <!-- Contenu texte -->
+        <div class="card-body">
+            <h5 class="card-title text-primary">{{ service.titre }}</h5>
+            <p class="card-text">{{ service.description|truncatewords:25 }}</p>
+            <p class="fw-bold text-success mb-1">{{ service.prix }} FCFA</p>
+            <p class="text-muted small mb-2">
+                Catégorie : {{ service.categorie }}
+            </p>
+            <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
+                Voir plus
+            </a>
+        </div>
+
+        <div class="card-footer text-muted small">
+            Publié le {{ service.date_publication|date:"d/m/Y" }}
+        </div>
+    </div>
+</div>

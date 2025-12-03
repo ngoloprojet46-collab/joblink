@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container py-4">
 
-    <!-- 🔎 Recherche + Filtre ville : version moderne -->
+    <!-- 🔎 Recherche + Filtre ville -->
     <form method="GET" class="row g-2 mb-4 bg-white p-3 shadow-sm rounded-4">
 
         <!-- Filtre par ville -->
@@ -21,7 +21,7 @@
         <div class="col-md-6">
             <input type="text" name="q" class="form-control form-control-lg rounded-3"
                    placeholder="Rechercher un service..."
-                   value="{{ request.GET.q|default:'' }}">
+                   value="{{ query|default:'' }}">
         </div>
 
         <!-- Bouton -->
@@ -44,61 +44,61 @@
     {% endif %}
 
     {% if services %}
-        <div class="row">
-
+        <div class="row" id="services-container">
             {% for service in services %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-
-                        <!-- 🖼 Image ou 🎥 Vidéo -->
-                        {% if service.image %}
-                            <img src="{{ service.image.url }}" 
-                                 class="card-img-top rounded-top"
-                                 alt="Image du service"
-                                 style="height: 200px; object-fit: cover; border-radius: 12px;">
-                        
-                        {% elif service.video %}
-                            <video class="card-img-top rounded-top"
-                                   style="height: 200px; object-fit: cover; border-radius: 12px;"
-                                   controls>
-                                <source src="{{ service.video.url }}" type="video/mp4">
-                                Votre navigateur ne supporte pas la vidéo.
-                            </video>
-
-                        {% else %}
-                            <img src="https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
-                                class="card-img-top rounded-top"
-                                alt="Aucun média disponible"
-                                style="height: 200px; object-fit: cover; border-radius: 12px;">
-                        {% endif %}
-
-
-                        <!-- Texte -->
-                        <div class="card-body">
-                            <h5 class="card-title text-primary">{{ service.titre }}</h5>
-                            <p class="card-text">{{ service.description|truncatewords:25 }}</p>
-                            <p class="fw-bold text-success mb-1">{{ service.prix }} FCFA</p>
-                            <p class="text-muted small mb-2">
-                                Catégorie : {{ service.categorie }}
-                            </p>
-                            <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
-                                Voir plus
-                            </a>
-                        </div>
-
-                        <div class="card-footer text-muted small">
-                            Publié le {{ service.date_publication|date:"d/m/Y" }}
-                        </div>
-                    </div>
-                </div>
+                {% include 'core/partials/service_card.html' %}
             {% endfor %}
-
         </div>
 
+        <div id="loading" class="text-center my-4 d-none">
+            Chargement...
+        </div>
     {% else %}
         <p class="text-center text-muted mt-4">
             Aucun service trouvé pour le moment.
         </p>
     {% endif %}
 </div>
+
+<!-- Infinite scroll JS -->
+<script>
+let page = 2;  // page 1 déjà chargée
+let loading = false;
+
+window.addEventListener('scroll', () => {
+    if (loading) return;
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+        loadMoreServices();
+    }
+});
+
+function loadMoreServices() {
+    loading = true;
+    document.getElementById('loading').classList.remove('d-none');
+
+    const query = encodeURIComponent("{{ query|default:'' }}");
+    const ville = encodeURIComponent("{{ ville|default:'' }}");
+
+    fetch("{% url 'services_feed' %}?page=" + page + "&q=" + query + "&ville=" + ville, {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('services-container').insertAdjacentHTML('beforeend', data.cards_html);
+        if (data.has_next) {
+            page += 1;
+            loading = false;
+        } else {
+            window.removeEventListener('scroll', loadMoreServices);
+        }
+        document.getElementById('loading').classList.add('d-none');
+    })
+    .catch(err => {
+        console.error(err);
+        loading = false;
+        document.getElementById('loading').classList.add('d-none');
+    });
+}
+</script>
+
 {% endblock %}

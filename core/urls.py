@@ -43,7 +43,11 @@ urlpatterns = [
 
     # Services
     path('', views.home, name='home'),
-    path('services/', views.service_list, name='service_list'),
+    
+    path('services/', views.service_list, name='service_list'),  # ancienne vue
+    path('services/feed/', views.services_feed, name='services_feed'),  # nouvelle vue
+
+
     path('services/<int:pk>/', views.service_detail, name='service_detail'),
     path('add-service/', views.add_service, name='add_service'),
     path('search/', views.quick_search, name='quick_search'),
@@ -104,4 +108,14 @@ urlpatterns = [
     path('prestataire/notifications/', views.liste_notifications_prestataire, name='liste_notifications_prestataire'),
     path('prestataire/notifications/<int:notif_id>/supprimer/', views.supprimer_notification_prestataire, name='supprimer_notification_prestataire'),
 
+
+
+]
+
+from django.views.static import serve
+from django.conf import settings
+from django.urls import re_path
+
+urlpatterns += [
+    re_path(r'^(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]

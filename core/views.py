@@ -23,6 +23,15 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .models import Boutique
 from .forms import BoutiqueForm
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from .models import Service
+from django.db.models import Q
+
+
+
+
 
 
 
@@ -94,8 +103,6 @@ def creer_boutique(request):
 
     return render(request, 'core/creer_boutique.html', {'form': form})
 
-from django.shortcuts import render
-from .models import Boutique
 
 def boutiques_emploi(request):
     query = request.GET.get('q')
@@ -243,14 +250,46 @@ def redirection_dashboard(request):
     # Par défaut
     return redirect('home')
 
-
-# Liste des services
+# Page liste des services (vue classique)
 def service_list(request):
     query = request.GET.get('q')
     ville = request.GET.get('ville')
 
-    # Trier du plus récent au plus ancien
-    services = Service.objects.all().order_by('-date_publication')
+    services = Service.objects.filter(disponible=True).order_by('-date_publication')
+
+    if query:
+        services = services.filter(Q(titre_icontains=query) | Q(categorie_icontains=query))
+    
+    if ville:
+        services = services.filter(ville=ville)
+
+    paginator = Paginator(services, 6)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = []
+
+    context = {
+        'services': page_obj,
+        'query': query,
+        'ville': ville,
+        'villes': Service.VILLES_CI,
+        'user_role': request.user.role if request.user.is_authenticated else None
+    }
+
+    return render(request, 'core/service_list.html', context)
+
+
+# API pour infinite scroll (Ajax)
+
+def services_feed(request):
+    query = request.GET.get('q')
+    ville = request.GET.get('ville')
+
+    services = Service.objects.filter(disponible=True).order_by('-date_publication')
 
     if query:
         services = services.filter(
@@ -261,14 +300,32 @@ def service_list(request):
     if ville:
         services = services.filter(ville=ville)
 
+    paginator = Paginator(services, 6)
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)  # ⚠ Dernière page au lieu de liste vide
+
+    # Si requête Ajax
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        cards_html = ""
+        for service in page_obj:
+            cards_html += render_to_string('core/partials/service_card.html', {'service': service}, request=request)
+        return JsonResponse({'cards_html': cards_html, 'has_next': page_obj.has_next()})
+
     context = {
-        'services': services,
+        'services': page_obj,
         'query': query,
         'ville': ville,
         'villes': Service.VILLES_CI,
         'user_role': request.user.role if request.user.is_authenticated else None
     }
     return render(request, 'core/service_list.html', context)
+
 
 # Détail d’un service
 def service_detail(request, pk):

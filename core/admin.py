@@ -41,3 +41,27 @@ class AvisAdmin(admin.ModelAdmin):
     list_filter = ('date',)
     search_fields = ('nom', 'message')
 
+
+from django.contrib import admin
+from .models import Boutique
+
+@admin.register(Boutique)
+class BoutiqueAdmin(admin.ModelAdmin):
+    list_display = ('nom', 'prestataire', 'categorie', 'date_creation')
+    list_filter = ('categorie', 'date_creation')
+    search_fields = ('nom', 'prestataire_user_username')
+    readonly_fields = ('date_creation',)
+
+    fieldsets = (
+        ("Informations principales", {
+            "fields": ("prestataire", "nom", "description", "categorie")
+        }),
+        ("Image de la boutique", {
+            "fields": ("image",),
+        }),
+        ("Dates", {
+            "fields": ("date_creation",),
+        }),
+    )
+
+
