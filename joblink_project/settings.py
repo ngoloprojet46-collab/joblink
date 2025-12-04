@@ -11,8 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Sécurité
 # -------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
-#DEBUG = True
+#DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -141,4 +141,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'tonemail@gmail.com'   # ton email
 EMAIL_HOST_PASSWORD = 'ton_mot_de_passe_application'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
