@@ -60,7 +60,7 @@ class Service(models.Model):
     )
     titre = models.CharField(max_length=100)
     description = models.TextField()
-    prix = models.DecimalField(max_digits=10, decimal_places=2)
+    prix = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     telephone = models.CharField(max_length=20, blank=True, null=True)
     adresse = models.CharField(max_length=255, blank=True, null=True)
     categorie = models.CharField(max_length=100)
