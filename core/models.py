@@ -166,3 +166,19 @@ class Boutique(models.Model):
 
     def __str__(self):
         return self.nom
+
+
+class Message(models.Model):
+    service = models.ForeignKey('Service', on_delete=models.CASCADE, related_name='messages')
+    commande = models.ForeignKey('Commande', on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
+    sender_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
+    content = models.TextField()
+    date_sent = models.DateTimeField(auto_now_add=True)
+    lu = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['date_sent']
+
+    def __str__(self):
+        return f"{self.sender_user.username} → {self.receiver_user.username} ({self.service.titre})"

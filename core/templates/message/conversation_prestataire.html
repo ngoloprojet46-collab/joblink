@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    
+    <!-- 🔙 Bouton retour -->
+    <a href="{% url 'boite_messages_prestataire' %}" class="btn btn-secondary mb-3">⬅ Retour</a>
+
+    <h3>Répondre à {{ message.sender_user.username }} pour le service : {{ message.service.titre }}</h3>
+    
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6>Message reçu :</h6>
+            <p>{{ message.content|linebreaksbr }}</p>
+            <small class="text-muted">{{ message.date_sent|date:"d/m/Y H:i" }}</small>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="content" class="form-label">Votre réponse</label>
+            <textarea name="content" id="content" class="form-control" rows="4" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+        <a href="{% url 'boite_messages_prestataire' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

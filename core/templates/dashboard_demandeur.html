@@ -23,6 +23,16 @@
                     <a href="{% url 'profil' %}" class="btn btn-primary mb-3">
                         <i class="bi bi-person-circle"></i> Voir mon profil
                     </a>
+                    <!-- Ajout juste après le bouton "Voir mon profil" -->
+                    <a href="{% url 'boite_messages_demandeur' %}" class="btn btn-success mb-3 position-relative">
+                        <i class="bi bi-envelope"></i> Boîte de messages
+                        {% if messages_non_lus > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ messages_non_lus }}
+                                <span class="visually-hidden">messages non lus</span>
+                            </span>
+                        {% endif %}
+                    </a>
 
                 </div>
 

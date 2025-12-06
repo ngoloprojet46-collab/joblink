@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center text-primary mb-4">Envoyer un message à {{ service.prestataire.user.username }}</h2>
+
+    <div class="card shadow-sm p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="content" class="form-label">Message</label>
+                <textarea name="content" id="content" class="form-control" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

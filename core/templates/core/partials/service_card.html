@@ -32,6 +32,9 @@
             <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
                 Voir plus
             </a>
+            <a href="{% url 'envoyer_message' service.id %}" class="btn btn-sm btn-outline-primary">
+                💬 Message au prestataire
+            </a>
         </div>
 
         <div class="card-footer text-muted small">

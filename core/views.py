@@ -712,3 +712,273 @@ def reset_password(request):
     return render(request, 'core/reset_password.html')
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Service, Commande, Message, Prestataire, Demandeur, Notification
+from django.db.models import Q
+
+
+# --------------------------
+# ⿡ Envoyer un message (Demandeur → Prestataire)
+# --------------------------
+@login_required
+def envoyer_message(request, service_id):
+    service = get_object_or_404(Service, id=service_id)
+    demandeur = getattr(request.user, 'demandeur', None)
+    if not demandeur:
+        messages.error(request, "Seuls les demandeurs peuvent envoyer un message.")
+        return redirect('home')
+
+    prestataire_user = service.prestataire.user
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            Message.objects.create(
+                service=service,
+                sender_user=request.user,
+                receiver_user=prestataire_user,
+                content=content
+            )
+
+            # Notification pour le prestataire
+            Notification.objects.create(
+                user=prestataire_user,
+                prestataire=service.prestataire,
+                message=f"Nouveau message de {request.user.username} concernant « {service.titre} »"
+            )
+
+            messages.success(request, "Message envoyé au prestataire ✅")
+            return redirect('service_list')
+        else:
+            messages.error(request, "Le message ne peut pas être vide.")
+
+    return render(request, 'message/envoyer_message.html', {'service': service})
+
+# --------------------------
+# ⿢ Répondre à un message (Prestataire → Demandeur)
+# --------------------------
+@login_required
+def repondre_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+
+    # Vérification : seul le prestataire concerné peut répondre
+    if message.receiver_user != request.user:
+        messages.error(request, "Action non autorisée.")
+        return redirect('tableau_prestataire')
+
+    prestataire = message.receiver_user.prestataire
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            # Création du message de réponse
+            Message.objects.create(
+                service=message.service,
+                sender_user=request.user,
+                receiver_user=message.sender_user,
+                content=content
+            )
+
+            # Notification pour le demandeur
+            Notification.objects.create(
+                user=message.sender_user,
+                prestataire=prestataire,
+                message=f"Réponse du prestataire {request.user.username} sur « {message.service.titre} »"
+            )
+
+            messages.success(request, "Réponse envoyée ✅")
+            return redirect('tableau_prestataire')
+        else:
+            messages.error(request, "Le message ne peut pas être vide.")
+
+    # Récupérer toute la conversation entre ces deux utilisateurs pour ce service
+    conversation = Message.objects.filter(
+    Q(service=message.service) & (
+        Q(sender_user=request.user, receiver_user=message.sender_user) |
+        Q(sender_user=message.sender_user, receiver_user=request.user)
+    )
+).order_by('date_sent')
+
+    return render(request, 'message/repondre_message.html', {
+        'conversation': conversation,
+        'service': message.service,
+        'demandeur': message.sender_user
+    })
+
+
+
+@login_required
+def boite_messages_prestataire(request):
+    prestataire = getattr(request.user, 'prestataire', None)
+    if not prestataire:
+        messages.error(request, "Vous devez être prestataire pour accéder à la messagerie.")
+        return redirect('home')
+
+    messages_reçus = Message.objects.filter(
+        service__prestataire=prestataire,
+        receiver_user=request.user
+    ).order_by('-date_sent')
+
+    context = {
+        'messages_reçus': messages_reçus
+    }
+    return render(request, 'message/boite_messages_prestataire.html', context)
+
+def repondre_message_prestataire(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+
+    if message.service.prestataire.user != request.user:
+        messages.error(request, "Action non autorisée.")
+        return redirect('boite_messages_prestataire')
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+
+        if content.strip() != "":
+            Message.objects.create(
+                service=message.service,
+                sender_user=request.user,
+                receiver_user=message.sender_user,
+                content=content
+            )
+
+            Notification.objects.create(
+                user=message.sender_user,
+                prestataire=message.service.prestataire,
+                message=f"Réponse du prestataire {request.user.username} pour le service « {message.service.titre} »"
+            )
+
+            messages.success(request, "Réponse envoyée avec succès.")
+            return redirect('conversation_prestataire', message_id=message_id)
+
+    return render(request, 'message/conversation_prestataire.html', {'message': message})
+
+@login_required
+def supprimer_message_prestataire(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+
+    if message.receiver_user != request.user:
+        messages.error(request, "Action non autorisée.")
+        return redirect('boite_messages_prestataire')
+
+    message.delete()
+    messages.success(request, "Message supprimé.")
+    return redirect('boite_messages_prestataire')
+
+
+from django.db.models import Q
+
+@login_required
+def conversation_prestataire(request, message_id):
+    prestataire = getattr(request.user, 'prestataire', None)
+    if not prestataire:
+        messages.error(request, "Vous devez être prestataire pour accéder à la messagerie.")
+        return redirect('home')
+
+    message = get_object_or_404(Message, id=message_id)
+
+    # Vérifie que le prestataire est bien concerné
+    if message.service.prestataire != prestataire:
+        messages.error(request, "Accès non autorisé.")
+        return redirect('boite_messages_prestataire')
+
+    # Le demandeur = l'autre utilisateur de la conversation
+    autre_user = message.sender_user
+
+    # Fil de la conversation complète
+    conversation = Message.objects.filter(
+        service=message.service
+    ).filter(
+        (Q(sender_user=request.user) & Q(receiver_user=autre_user)) |
+        (Q(sender_user=autre_user) & Q(receiver_user=request.user))
+    ).order_by('date_sent')
+
+    context = {
+        'message': message,
+        'conversation': conversation,
+    }
+    return render(request, 'message/conversation_prestataire.html', context)
+
+
+
+@login_required
+def boite_messages_demandeur(request):
+    demandeur = getattr(request.user, 'demandeur', None)
+    if not demandeur:
+        messages.error(request, "Vous devez être un demandeur pour accéder à la messagerie.")
+        return redirect('home')
+
+    # 🔥 Liste simple des messages reçus uniquement
+    messages_reçus = Message.objects.filter(
+        receiver_user=request.user
+    ).order_by('-date_sent')
+
+    context = {
+        'messages_reçus': messages_reçus,
+    }
+    return render(request, 'message/boite_messages_demandeur.html', context)
+
+@login_required
+def supprimer_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+
+    # Seul l’expéditeur ou le destinataire peut supprimer
+    if request.user != message.sender_user and request.user != message.receiver_user:
+        messages.error(request, "Vous n'avez pas la permission de supprimer ce message.")
+        return redirect('home')
+
+    # Position de retour (prestataire ou demandeur)
+    if hasattr(request.user, 'prestataire'):
+        retour_url = 'boite_messages_prestataire'
+    else:
+        retour_url = 'boite_messages_demandeur'
+
+    message.delete()
+    messages.success(request, "Message supprimé avec succès.")
+    return redirect(retour_url)
+
+@login_required
+def conversation_demandeur(request, service_id, prestataire_id):
+    demandeur = getattr(request.user, 'demandeur', None)
+    if not demandeur:
+        messages.error(request, "Vous devez être demandeur pour accéder à cette conversation.")
+        return redirect('home')
+
+    service = get_object_or_404(Service, id=service_id)
+    prestataire_user = get_object_or_404(User, id=prestataire_id)
+
+    # Récupération de toute la conversation entre demandeur et prestataire
+    conversation = Message.objects.filter(
+        service=service
+    ).filter(
+        Q(sender_user=request.user, receiver_user=prestataire_user) |
+        Q(sender_user=prestataire_user, receiver_user=request.user)
+    ).order_by('date_sent')
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            Message.objects.create(
+                service=service,
+                sender_user=request.user,
+                receiver_user=prestataire_user,
+                content=content
+            )
+
+            # Notification pour le prestataire
+            Notification.objects.create(
+                user=prestataire_user,
+                prestataire=service.prestataire,
+                message=f"Nouveau message de {request.user.username} sur « {service.titre} »"
+            )
+
+            return redirect('conversation_demandeur', service_id=service.id, prestataire_id=prestataire_id)
+
+    return render(request, 'message/conversation_demandeur.html', {
+        'conversation': conversation,
+        'service': service,
+        'prestataire': prestataire_user,
+    })
+

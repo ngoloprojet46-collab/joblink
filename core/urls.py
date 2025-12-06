@@ -13,7 +13,29 @@ from .views import (
 
 
 urlpatterns = [
-    
+
+
+
+    path('demandeur/boite-messages/', views.boite_messages_demandeur, name='boite_messages_demandeur'),
+    path(
+    'demandeur/conversation/<int:service_id>/<int:prestataire_id>/',
+    views.conversation_demandeur,
+    name='conversation_demandeur'
+),
+
+    path('message/supprimer/<int:message_id>/',
+     views.supprimer_message,
+     name='supprimer_message'),
+
+    path('prestataire/messages/', views.boite_messages_prestataire, name='boite_messages_prestataire'),
+    path('prestataire/messages/<int:message_id>/', views.conversation_prestataire, name='conversation_prestataire'),
+    path('prestataire/messages/<int:message_id>/repondre/', views.repondre_message_prestataire, name='repondre_message_prestataire'),
+    path('prestataire/messages/<int:message_id>/supprimer/', views.supprimer_message_prestataire, name='supprimer_message_prestataire'),
+
+
+    path('service/<int:service_id>/message/', views.envoyer_message, name='envoyer_message'),
+    path('message/<int:message_id>/repondre/', views.repondre_message, name='repondre_message'),
+
     path('reset-password/', views.reset_password, name='reset_password'),
 
     path('admin-dashboard/', views_admin.admin_dashboard, name='admin_dashboard'),

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">📩 Boîte de réception - Prestataire</h2>
+
+  {% if messages_reçus %}
+    <ul class="list-group">
+      {% for msg in messages_reçus %}
+        <li class="list-group-item d-flex justify-content-between align-items-center {% if not msg.lu %}bg-light{% endif %}">
+          <div>
+            <strong>{{ msg.sender_user.username }}</strong> pour <em>{{ msg.service.titre }}</em><br>
+            <small>{{ msg.date_sent|date:"d/m/Y H:i" }}</small>
+          </div>
+          <div>
+            <a href="{% url 'repondre_message_prestataire' msg.id %}" class="btn btn-sm btn-primary">Répondre</a>
+            <a href="{% url 'supprimer_message' msg.id %}" class="btn btn-sm btn-danger">Supprimer</a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Aucun message pour le moment.</p>
+  {% endif %}
+</div>
+{% endblock %}

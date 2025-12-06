@@ -28,6 +28,9 @@
             <h5 class="card-title">{{ service.titre }}</h5>
             <p class="card-text">{{ service.prix }} FCFA</p>
             <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm">Voir le service</a>
+            <a href="{% url 'envoyer_message' service.id %}" class="btn btn-sm btn-outline-primary">
+                💬 Message au prestataire
+            </a>
           </div>
         </div>
       </div>

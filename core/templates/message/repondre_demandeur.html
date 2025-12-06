@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Répondre au message</h2>
+  <p>Service : <strong>{{ message.service.titre }}</strong></p>
+  <p>De : <strong>{{ message.sender_user.username }}</strong></p>
+  <p>{{ message.content }}</p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+      <textarea class="form-control" name="content" rows="4" placeholder="Votre réponse ici..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Envoyer</button>
+  </form>
+</div>
+{% endblock %}
