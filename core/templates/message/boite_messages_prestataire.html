@@ -12,7 +12,7 @@
             <small>{{ msg.date_sent|date:"d/m/Y H:i" }}</small>
           </div>
           <div>
-            <a href="{% url 'repondre_message_prestataire' msg.id %}" class="btn btn-sm btn-primary">Répondre</a>
+            <a href="{% url 'conversation_prestataire' msg.id %}" class="btn btn-sm btn-primary">Répondre</a>
             <a href="{% url 'supprimer_message' msg.id %}" class="btn btn-sm btn-danger">Supprimer</a>
           </div>
         </li>

@@ -29,7 +29,6 @@ urlpatterns = [
 
     path('prestataire/messages/', views.boite_messages_prestataire, name='boite_messages_prestataire'),
     path('prestataire/messages/<int:message_id>/', views.conversation_prestataire, name='conversation_prestataire'),
-    path('prestataire/messages/<int:message_id>/repondre/', views.repondre_message_prestataire, name='repondre_message_prestataire'),
     path('prestataire/messages/<int:message_id>/supprimer/', views.supprimer_message_prestataire, name='supprimer_message_prestataire'),
 
 

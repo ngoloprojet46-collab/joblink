@@ -2,25 +2,47 @@
 {% block content %}
 <div class="container mt-5">
     
-    <!-- 🔙 Bouton retour -->
     <a href="{% url 'boite_messages_prestataire' %}" class="btn btn-secondary mb-3">⬅ Retour</a>
 
-    <h3>Répondre à {{ message.sender_user.username }} pour le service : {{ message.service.titre }}</h3>
-    
-    <div class="card mb-3">
-        <div class="card-body">
-            <h6>Message reçu :</h6>
-            <p>{{ message.content|linebreaksbr }}</p>
-            <small class="text-muted">{{ message.date_sent|date:"d/m/Y H:i" }}</small>
-        </div>
+    <h3>Conversation avec {{ demandeur.username }} - Service : {{ service.titre }}</h3>
+
+    <div class="card p-3 mb-4" style="max-height: 400px; overflow-y: auto;">
+        
+        {% if conversation %}
+            {% for msg in conversation %}
+                
+                {% if msg.sender_user == request.user %}
+                    <!-- 💬 Message du prestataire (moi) -->
+                    <div class="text-end mb-3">
+                        <div class="d-inline-block p-2 rounded bg-primary text-white" style="max-width: 60%;">
+                            {{ msg.content|linebreaksbr }}
+                        </div>
+                        <div><small class="text-muted">{{ msg.date_sent|date:"d/m/Y H:i" }}</small></div>
+                    </div>
+
+                {% else %}
+                    <!-- 💬 Message du demandeur -->
+                    <div class="text-start mb-3">
+                        <div class="d-inline-block p-2 rounded bg-light" style="max-width: 60%;">
+                            {{ msg.content|linebreaksbr }}
+                        </div>
+                        <div><small class="text-muted">{{ msg.date_sent|date:"d/m/Y H:i" }}</small></div>
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">Aucun message pour le moment.</p>
+        {% endif %}
+
     </div>
 
+    <!-- Formulaire de réponse -->
     <form method="post">
         {% csrf_token %}
-
         <div class="mb-3">
             <label for="content" class="form-label">Votre réponse</label>
-            <textarea name="content" id="content" class="form-control" rows="4" required></textarea>
+            <textarea name="content" id="content" class="form-control" rows="3" required></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Envoyer</button>

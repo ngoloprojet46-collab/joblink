@@ -168,17 +168,41 @@ class Boutique(models.Model):
         return self.nom
 
 
-class Message(models.Model):
-    service = models.ForeignKey('Service', on_delete=models.CASCADE, related_name='messages')
-    commande = models.ForeignKey('Commande', on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
-    sender_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
-    receiver_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
+class ConversationMessage(models.Model):
+    service = models.ForeignKey(
+        'Service',
+        on_delete=models.CASCADE,
+        related_name='conversation_messages'
+    )
+
+    commande = models.ForeignKey(
+        'Commande',
+        on_delete=models.CASCADE,
+        related_name='conversation_messages',
+        null=True,
+        blank=True
+    )
+
+    sender_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='conversation_messages_sent'
+    )
+
+    receiver_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='conversation_messages_received'
+    )
+
     content = models.TextField()
     date_sent = models.DateTimeField(auto_now_add=True)
     lu = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['date_sent']
+        verbose_name = "Message de conversation"
+        verbose_name_plural = "Messages de conversation"
 
     def __str__(self):
         return f"{self.sender_user.username} → {self.receiver_user.username} ({self.service.titre})"
