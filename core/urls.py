@@ -14,6 +14,7 @@ from .views import (
 
 urlpatterns = [
 
+    #path('test-email/', views.test_email, name='test_email'),
 
 
     path('demandeur/boite-messages/', views.boite_messages_demandeur, name='boite_messages_demandeur'),

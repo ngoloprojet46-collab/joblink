@@ -26,6 +26,37 @@
             color: #0d6efd;
         }
 
+        /* === Header fixe === */
+        .navbar {
+            position: fixed;    /* Fixe le header en haut */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;      /* Toujours au-dessus du contenu */
+        }
+
+        /* Décalage du contenu pour que le header ne le cache pas */
+        main.container {
+            margin-top: 80px;   /* Ajuste selon la hauteur réelle de ta navbar */
+        }
+
+        /* Réduire la hauteur de la navbar */
+        .navbar {
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+        }
+
+        
+
+        .navbar-brand img {
+            height: 32px;  /* ↓ réduis un peu la taille du logo */
+        }
+
+        /* Fixe le header et empêche le contenu d’entrer dedans */
+        body {
+            padding-top: 60px; /* Ajustable selon la hauteur de ta navbar */
+        }
+
         /* === Navbar === */
         .navbar {
             background: linear-gradient(90deg, #0d6efd, #007bff);

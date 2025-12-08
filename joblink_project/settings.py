@@ -135,12 +135,9 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'tonemail@gmail.com'   # ton email
-EMAIL_HOST_PASSWORD = 'ton_mot_de_passe_application'
+
+
+#DEFAULT_FROM_EMAIL = "JobLink <9d4f8c001@smtp-brevo.com>"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
