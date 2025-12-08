@@ -158,3 +158,8 @@ PWA_APP_ICONS = [
         'sizes': '512x512'
     }
 ]
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"  # ou Path(BASE_DIR, "staticfiles") selon ta version
+
