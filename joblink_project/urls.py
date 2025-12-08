@@ -18,13 +18,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include
+from pwa.views import manifest, service_worker
+
 
 
 urlpatterns = [
     # ... tes autres URLs ...
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),  # pour login/logout
+    path('accounts/', include('django.contrib.auth.urls')), 
+    path('', include('pwa.urls')), # pour login/logout
+    path('manifest.json', manifest, name='manifest'),
+    path('serviceworker.js', service_worker, name='serviceworker'),
 
 ]
 

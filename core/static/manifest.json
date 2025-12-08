@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "JobLink",
+  "short_name": "JobLink",
+  "description": "Plateforme de prestation et de services.",
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0a7cff",
+  "icons": [
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "lang": "fr-FR",
+  "dir": "auto"
+}

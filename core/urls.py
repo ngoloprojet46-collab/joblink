@@ -4,6 +4,8 @@ from . import views
 from .views import detail_commande, profil_view
 from . import views_admin
 
+
+
 from .views import (
     creer_boutique,
     boutiques_emploi,
@@ -15,6 +17,7 @@ from .views import (
 urlpatterns = [
 
     #path('test-email/', views.test_email, name='test_email'),
+    
 
 
     path('demandeur/boite-messages/', views.boite_messages_demandeur, name='boite_messages_demandeur'),

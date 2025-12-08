@@ -11,8 +11,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Sécurité
 # -------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
-#DEBUG = True
+#DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "cloudinary_storage",
 
     "core",
+    "pwa",
 ]
 
 # -------------------------
@@ -142,3 +143,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+PWA_APP_NAME = 'JobLink'
+PWA_APP_SHORT_NAME = 'JobLink'
+PWA_APP_DESCRIPTION = "Plateforme de prestation et de services."
+PWA_APP_THEME_COLOR = '#0a7cff'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = '#0a7cff'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/icons/icon-512.png',
+        'sizes': '512x512'
+    }
+]
