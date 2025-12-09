@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.onrender.joblink_fdot.twa",
+    "sha256_cert_fingerprints": [
+      "B4:C5:07:97:D2:5D:5B:47:5B:2A:55:A2:D0:E1:46:C2:36:7A:70:AF:BA:5E:E5:1E:7D:D0:20:92:44:B0:69:7E"
+    ]
+    }
+}]

@@ -20,6 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from pwa.views import manifest, service_worker
+from django.views.generic import TemplateView
+from django.views.decorators.cache import cache_control
 
 
 
@@ -31,6 +33,16 @@ urlpatterns = [
     path('', include('pwa.urls')), # pour login/logout
     path('manifest.json', manifest, name='manifest'),
     path('serviceworker.js', service_worker, name='serviceworker'),
+    path(
+        ".well-known/assetlinks.json",
+        cache_control(no_cache=True, must_revalidate=True)(
+            TemplateView.as_view(
+                template_name="assetlinks.json",
+                content_type="application/json"
+            )
+        ),
+        name="assetlinks"
+    ),
 
 ]
 
