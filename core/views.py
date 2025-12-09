@@ -32,6 +32,34 @@ from django.db.models import Q
 from .models import ConversationMessage
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Abonnement
+
+@csrf_exempt
+def wave_webhook(request):
+    """
+    Wave envoie les infos du paiement ici.
+    """
+    if request.method == "POST":
+        data = request.POST  # ou json.loads(request.body) si JSON
+        user_id = data.get("user_id")  # À récupérer selon ton intégration Wave
+        montant = data.get("amount")
+
+        try:
+            abonnement = Abonnement.objects.get(user__id=user_id)
+            # Prolonger de 30 jours
+            abonnement.prolonger(30)
+            return JsonResponse({"status": "ok"})
+        except Abonnement.DoesNotExist:
+            return JsonResponse({"status": "user not found"}, status=404)
+    
+    return JsonResponse({"status": "method not allowed"}, status=405)
+
+
+@login_required
+def renouveler_abonnement(request):
+    return render(request, "renouveler_abonnement.html")
 
 
 
@@ -183,6 +211,10 @@ def profil_view(request):
 
 
 # Tableau de bord Prestataire
+from .decorators import abonnement_actif_required
+from django.contrib.auth.decorators import login_required
+
+@abonnement_actif_required
 @login_required
 def tableau_prestataire(request):
     try:
@@ -208,6 +240,10 @@ def tableau_prestataire(request):
     return render(request, 'dashboard_prestataire.html', context)
 
 # Tableau de bord Demandeur
+from .decorators import abonnement_actif_required
+from django.contrib.auth.decorators import login_required
+
+@abonnement_actif_required
 @login_required
 def tableau_demandeur(request):
     demandeur = get_object_or_404(Demandeur, user=request.user)
@@ -584,31 +620,15 @@ def voir_prestataire_depuis_notification(request, notif_id):
     else:
         return redirect('mes_notifications')
 
-def abonnement_expire(request):
-    return render(request, 'core/abonnement_expire.html')
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 @login_required
 def gerer_abonnement(request):
-    # Récupérer ou créer l’abonnement de l’utilisateur
-    abonnement, created = Abonnement.objects.get_or_create(user=request.user)
+    abonnement = request.user.abonnement  # On récupère l'abonnement lié à l'utilisateur
+    return render(request, "core/gerer_abonnement.html", {"abonnement": abonnement})
 
-    # Vérifier si expiré
-    if abonnement.date_fin < date.today():
-        abonnement.actif = False
-        abonnement.save()
 
-    # Si l’utilisateur demande un renouvellement
-    if request.method == "POST":
-        abonnement.date_debut = date.today()
-        abonnement.date_fin = abonnement.date_debut + timedelta(days=30)
-        abonnement.actif = True
-        abonnement.save()
-        messages.success(request, "Votre abonnement a été renouvelé avec succès.")
-        return redirect('gerer_abonnement')
-
-    return render(request, "core/gerer_abonnement.html", {
-        "abonnement": abonnement
-    })
 
 # Ajouter un commentaire
 def commenter(request):

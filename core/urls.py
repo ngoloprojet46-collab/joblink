@@ -17,8 +17,10 @@ from .views import (
 urlpatterns = [
 
     #path('test-email/', views.test_email, name='test_email'),
-    
+    path('renouveler-abonnement/', views.renouveler_abonnement, name='renouveler_abonnement'),
 
+
+    path('wave-webhook/', views.wave_webhook, name='wave_webhook'),
 
     path('demandeur/boite-messages/', views.boite_messages_demandeur, name='boite_messages_demandeur'),
     path(
@@ -85,8 +87,8 @@ urlpatterns = [
     path('commande/<int:commande_id>/supprimer/', views.supprimer_commande, name='supprimer_commande'),
     path('commande/<int:commande_id>/supprimer_prestataire/', views.supprimer_commande_prestataire, name='supprimer_commande_prestataire'),
 
-    path('abonnement/expire/', views.abonnement_expire, name='abonnement_expire'),
-    path('abonnement/', views.gerer_abonnement, name='gerer_abonnement'),
+    path('mon-abonnement/', views.gerer_abonnement, name='gerer_abonnement'),
+
 
     # Mot de passe oublié
     path('password_reset/', 

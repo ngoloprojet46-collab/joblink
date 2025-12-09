@@ -1,16 +1,23 @@
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
-from django.contrib.auth.admin import UserAdmin
-from .models import User, Prestataire, Demandeur, Service, Commande, Paiement, Notification, Abonnement
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+from .models import (
+    User, Prestataire, Demandeur, Service, Commande,
+    Paiement, Notification, Abonnement, Avis, Boutique
+)
 
-# --- Activation de l'historique dans l'admin ---
+# -------------------------
+# Historique Admin
+# -------------------------
 admin.site.register(LogEntry)
 
 
-# --- Admin du User personnalisé ---
+# -------------------------
+# USER ADMIN PERSONNALISÉ
+# -------------------------
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Informations personnelles', {'fields': ('first_name', 'last_name', 'email', 'phone', 'photo')}),
@@ -23,17 +30,39 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username', 'email', 'phone')
 
 
-# --- Enregistrement des autres modèles ---
-admin.site.register(Prestataire)
-admin.site.register(Demandeur)
-admin.site.register(Service)
-admin.site.register(Commande)
-admin.site.register(Paiement)
-admin.site.register(Notification)
-admin.site.register(Abonnement)
+# -------------------------
+# ABONNEMENT ADMIN
+# -------------------------
+@admin.register(Abonnement)
+class AbonnementAdmin(admin.ModelAdmin):
+    list_display = ('user', 'type_utilisateur', 'date_debut', 'date_fin', 'actif')
+    list_filter = ('type_utilisateur', 'actif')
+    search_fields = ('user_username', 'user_email')
+    readonly_fields = ('date_debut',)
 
-from django.contrib import admin
-from .models import Avis
+    actions = ['prolonger_abonnement']
+
+    def prolonger_abonnement(self, request, queryset):
+        for abonnement in queryset:
+            abonnement.prolonger(30)
+        self.message_user(request, "Abonnement(s) prolongé(s) de 30 jours")
+    prolonger_abonnement.short_description = "Prolonger les abonnements sélectionnés de 30 jours"
+
+
+# -------------------------
+# AUTRES ADMINS
+# -------------------------
+@admin.register(Prestataire)
+class PrestataireAdmin(admin.ModelAdmin):
+    list_display = ('user', 'competence', 'experience', 'localisation', 'note_moyenne')
+    search_fields = ('user__username', 'competence', 'localisation')
+
+
+@admin.register(Demandeur)
+class DemandeurAdmin(admin.ModelAdmin):
+    list_display = ('user', 'adresse')
+    search_fields = ('user__username', 'adresse')
+
 
 @admin.register(Avis)
 class AvisAdmin(admin.ModelAdmin):
@@ -41,9 +70,6 @@ class AvisAdmin(admin.ModelAdmin):
     list_filter = ('date',)
     search_fields = ('nom', 'message')
 
-
-from django.contrib import admin
-from .models import Boutique
 
 @admin.register(Boutique)
 class BoutiqueAdmin(admin.ModelAdmin):
@@ -65,3 +91,10 @@ class BoutiqueAdmin(admin.ModelAdmin):
     )
 
 
+# -------------------------
+# Enregistrement direct
+# -------------------------
+admin.site.register(Service)
+admin.site.register(Commande)
+admin.site.register(Paiement)
+admin.site.register(Notification)

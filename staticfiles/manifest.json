@@ -1,5 +1,5 @@
 {
-  "id": "joblink-pwa",
+  "id": "com.joblink-app",
   "name": "JobLink",
   "short_name": "JobLink",
   "description": "Plateforme de prestation et de services.",
@@ -19,6 +19,7 @@
   { "src": "/static/icons/icon-384.png", "sizes": "384x384", "type": "image/png" },
   { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
 ],
+  "screenshots": [],
   "lang": "fr-FR",
   "dir": "auto"
 }

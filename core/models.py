@@ -118,26 +118,45 @@ class Notification(models.Model):
         return f"Notif pour {self.user.username} - {self.message[:30]}"
 
 
+
+from datetime import timedelta, date, datetime
+
+
+
 class Abonnement(models.Model):
+    TYPE_CHOICES = (
+        ('prestataire', 'Prestataire'),
+        ('demandeur', 'Demandeur'),
+    )
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    type_utilisateur = models.CharField(max_length=20, choices=TYPE_CHOICES)
     date_debut = models.DateField(auto_now_add=True)
     date_fin = models.DateField(blank=True, null=True)
     actif = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        # Si nouvel abonnement
+        # Si nouvel abonnement, 7 jours gratuits
         if not self.id:
             self.date_debut = date.today()
-            self.date_fin = self.date_debut + timedelta(days=30)
-
+            self.date_fin = self.date_debut + timedelta(days=7)
         # Vérifier si expiré
-        if self.date_fin:
-            self.actif = self.date_fin >= date.today()
-
+        self.actif = self.date_fin >= date.today()
         super().save(*args, **kwargs)
+
+    def prolonger(self, jours=30):
+        """Prolonger l'abonnement de X jours"""
+        self.date_fin = max(self.date_fin, date.today()) + timedelta(days=jours)
+        self.actif = True
+        self.save()
+
+    def est_actif(self):
+        return self.actif and self.date_fin >= date.today()
 
     def __str__(self):
         return f"Abonnement de {self.user.username} - {'Actif' if self.actif else 'Expiré'}"
+
+
 
 class Avis(models.Model):
     nom = models.CharField(max_length=100)
