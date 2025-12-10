@@ -77,21 +77,28 @@ def renouveler_abonnement(request):
 # Page d'accueil
 def home(request):
     services = Service.objects.order_by('-date_publication')[:9]
+
     default_bg = "https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
-    # Prépare une liste de tuples (service, bg_url)
+
     slides = []
     for s in services:
-        if getattr(s, 'image') and getattr(s.image, 'url', None):
+        # Vérifie si une image existe
+        if hasattr(s, 'image') and s.image and hasattr(s.image, 'url'):
             bg = s.image.url
         else:
             bg = default_bg
-        slides.append({'service': s, 'bg_url': bg})
+
+        slides.append({
+            'service': s,
+            'bg_url': bg
+        })
 
     context = {
         'slides': slides,
         'services': services,
         'user_role': request.user.role if request.user.is_authenticated else None
     }
+
     return render(request, 'core/home.html', context)
 
 
@@ -299,25 +306,33 @@ def redirection_dashboard(request):
 
 # Page liste des services (vue classique)
 def service_list(request):
-    query = request.GET.get('q')
-    ville = request.GET.get('ville')
+    query = request.GET.get('q', '').strip()
+    ville = request.GET.get('ville', '').strip()
 
+    # Services disponibles uniquement
     services = Service.objects.filter(disponible=True).order_by('-date_publication')
 
+    # Recherche
     if query:
-        services = services.filter(Q(titre_icontains=query) | Q(categorie_icontains=query))
-    
+        services = services.filter(
+            Q(titre__icontains=query) |
+            Q(categorie__icontains=query)
+        )
+
+    # Filtre par ville
     if ville:
         services = services.filter(ville=ville)
 
+    # Pagination
     paginator = Paginator(services, 6)
     page_number = request.GET.get('page', 1)
+
     try:
         page_obj = paginator.page(page_number)
     except PageNotAnInteger:
         page_obj = paginator.page(1)
     except EmptyPage:
-        page_obj = []
+        page_obj = paginator.page(paginator.num_pages)
 
     context = {
         'services': page_obj,
@@ -395,7 +410,7 @@ def add_service(request):
             service.prestataire = request.user.prestataire
             service.save()
             messages.success(request, 'Votre service a été ajouté avec succès ✅')
-            return redirect('service_list')
+            return redirect('tableau_prestataire')
     else:
         form = ServiceForm()
 

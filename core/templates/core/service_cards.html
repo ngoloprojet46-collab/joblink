@@ -1,10 +1,13 @@
-{% for service in services %}
 <div class="card shadow-sm mb-3">
     <div class="card-body">
 
         <!-- IMAGE / VIDÉO -->
         {% if service.image %}
-            <img src="{{ service.image.url }}" class="img-fluid rounded mb-2" style="height:200px; object-fit:cover;">
+            <!-- IMAGE CLIQUABLE pour modal -->
+            <a href="#" data-bs-toggle="modal" data-bs-target="#mediaModal{{ service.id }}">
+                <img src="{{ service.image.url }}" class="img-fluid rounded mb-2" 
+                     style="height:200px; object-fit:cover; cursor:pointer;">
+            </a>
         {% elif service.video %}
             <video class="img-fluid rounded mb-2" style="height:200px; object-fit:cover;" controls>
                 <source src="{{ service.video.url }}" type="video/mp4">
@@ -24,4 +27,20 @@
 
     </div>
 </div>
-{% endfor %}
+
+<!-- MODAL pour afficher l'image en grand -->
+{% if service.image %}
+<div class="modal fade" id="mediaModal{{ service.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">{{ service.titre }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{{ service.image.url }}" class="img-fluid rounded shadow" alt="{{ service.titre }}">
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
