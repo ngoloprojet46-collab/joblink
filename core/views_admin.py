@@ -29,3 +29,12 @@ def redirect_after_login(request):
     else:
         return redirect('demandeur_dashboard')
 
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Abonnement
+
+def renouveler_abonnement_admin(request, abonnement_id):
+    abonnement = get_object_or_404(Abonnement, id=abonnement_id)
+    abonnement.prolonger(30)
+    messages.success(request, f"L'abonnement de {abonnement.user.username} a été prolongé de 30 jours.")
+    return redirect('/admin/core/abonnement/')  # revenir à la liste admin

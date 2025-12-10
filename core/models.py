@@ -123,39 +123,45 @@ from datetime import timedelta, date, datetime
 
 
 
+from django.conf import settings
+
+
+from django.db import models
+from django.conf import settings
+from datetime import date, timedelta
+
 class Abonnement(models.Model):
     TYPE_CHOICES = (
         ('prestataire', 'Prestataire'),
-        ('demandeur', 'Demandeur'),
     )
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    type_utilisateur = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    type_utilisateur = models.CharField(max_length=20, choices=TYPE_CHOICES, default='prestataire')
     date_debut = models.DateField(auto_now_add=True)
     date_fin = models.DateField(blank=True, null=True)
     actif = models.BooleanField(default=True)
+    preuve_paiement = models.FileField(upload_to='preuves_abonnement/', blank=True, null=True)
+    note_admin = models.TextField(blank=True, null=True)  # Optionnel, pour commentaire admin
 
     def save(self, *args, **kwargs):
-        # Si nouvel abonnement, 7 jours gratuits
+        # Sécurité : si ce n'est pas un prestataire, on force type_utilisateur à prestataire
+        if self.user.role != 'prestataire':
+            self.type_utilisateur = 'prestataire'
+
+        # Création : ajouter 7 jours gratuits si nouvel abonnement
         if not self.id:
             self.date_debut = date.today()
             self.date_fin = self.date_debut + timedelta(days=7)
-        # Vérifier si expiré
         self.actif = self.date_fin >= date.today()
         super().save(*args, **kwargs)
 
     def prolonger(self, jours=30):
-        """Prolonger l'abonnement de X jours"""
         self.date_fin = max(self.date_fin, date.today()) + timedelta(days=jours)
         self.actif = True
         self.save()
 
     def est_actif(self):
         return self.actif and self.date_fin >= date.today()
-
-    def __str__(self):
-        return f"Abonnement de {self.user.username} - {'Actif' if self.actif else 'Expiré'}"
-
 
 
 class Avis(models.Model):

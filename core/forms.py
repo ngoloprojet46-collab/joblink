@@ -5,6 +5,14 @@ from .models import Service
 from django import forms
 
 
+from django import forms
+from .models import Abonnement
+
+class PreuvePaiementForm(forms.ModelForm):
+    class Meta:
+        model = Abonnement
+        fields = ['preuve_paiement']
+
 
 
 class UserRegisterForm(UserCreationForm):

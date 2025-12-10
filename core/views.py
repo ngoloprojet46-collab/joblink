@@ -32,65 +32,39 @@ from django.db.models import Q
 from .models import ConversationMessage
 
 
-# core/views.py
-import json
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.utils import timezone
-from .models import Abonnement, User
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Abonnement
+from .forms import PreuvePaiementForm
+from django.contrib import messages
 
-
-@csrf_exempt
-def wave_webhook(request):
-    """
-    Webhook pour recevoir les notifications de paiement Wave.
-    Testé pour POST uniquement. 
-    """
-    # Log de la méthode reçue pour débogage
-    print(f"[Wave Webhook] Méthode reçue: {request.method}")
-
-    if request.method != "POST":
-        return JsonResponse({"status": "method not allowed"}, status=405)
-
-    # Vérifier le format JSON
+@login_required
+def gerer_abonnement(request):
     try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        print("[Wave Webhook] Erreur JSON")
-        return JsonResponse({"status": "invalid json"}, status=400)
+        abonnement = Abonnement.objects.get(user=request.user)
+    except Abonnement.DoesNotExist:
+        # Créer un abonnement si inexistant (7 jours gratuits)
+        if request.user.role == 'prestataire':
+            abonnement = Abonnement.objects.create(user=request.user)
+        else:
+            messages.error(request, "Vous n'avez pas besoin d'abonnement.")
+            return redirect('dashboard')
 
-    user_id = data.get("user_id")
-    montant = data.get("amount")
-
-    if not user_id or not montant:
-        return JsonResponse({"status": "missing parameters"}, status=400)
-
-    # Récupérer l'abonnement ou le créer si absent
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        print(f"[Wave Webhook] Utilisateur {user_id} introuvable")
-        return JsonResponse({"status": "user not found"}, status=404)
-
-    abonnement, created = Abonnement.objects.get_or_create(
-        user=user,
-        defaults={
-            "type_utilisateur": user.role,
-            "date_debut": timezone.now().date(),
-            "date_fin": timezone.now().date() + timezone.timedelta(days=30),
-            "actif": True,
-        }
-    )
-
-    if not created:
-        # Prolonger l'abonnement de 30 jours si déjà existant
-        abonnement.prolonger(30)
-        print(f"[Wave Webhook] Abonnement de {user.username} prolongé de 30 jours")
+    if request.method == 'POST':
+        form = PreuvePaiementForm(request.POST, request.FILES, instance=abonnement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Preuve de paiement envoyée. L’administrateur vérifiera et prolongera votre abonnement.")
+            return redirect('gerer_abonnement')
     else:
-        print(f"[Wave Webhook] Abonnement créé pour {user.username}")
+        form = PreuvePaiementForm(instance=abonnement)
 
-    return JsonResponse({"status": "ok", "user": user.username})
-
+    context = {
+        'abonnement': abonnement,
+        'form': form,
+        'lien_paiement': 'https://pay.wave.com/m/M_ci_sSsHPGoJSRAa/c/ci/?amount=500'
+    }
+    return render(request, 'core/gerer_abonnement.html', context)
 
 @login_required
 def renouveler_abonnement(request):
@@ -663,25 +637,6 @@ from django.shortcuts import render, redirect
 from .models import Abonnement
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
-
-@login_required
-def gerer_abonnement(request):
-    # Essaye de récupérer l'abonnement
-    abonnement, created = Abonnement.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'type_utilisateur': request.user.role,
-            'date_debut': date.today(),
-            'date_fin': date.today() + timedelta(days=7),
-            'actif': True,
-        }
-    )
-
-    # Si l'abonnement n'était pas actif, tu peux l'afficher comme expiré
-    context = {
-        'abonnement': abonnement,
-    }
-    return render(request, 'core/gerer_abonnement.html', context)
 
 
 

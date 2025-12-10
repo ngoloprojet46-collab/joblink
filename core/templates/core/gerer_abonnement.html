@@ -1,27 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Mon Abonnement</h2>
+<div class="abonnement-container" style="max-width:600px; margin:auto; padding:20px; background:#f9f9f9; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center; margin-bottom:20px;">Mon Abonnement</h2>
 
-<p><strong>Type :</strong> {{ abonnement.type_utilisateur }}</p>
-<p><strong>Date de début :</strong> {{ abonnement.date_debut }}</p>
-<p><strong>Date de fin :</strong> {{ abonnement.date_fin }}</p>
-<p><strong>Statut :</strong> 
-    {% if abonnement.est_actif %}
-        Actif ✅
-    {% else %}
-        Expiré ❌
+    <p><strong>Statut :</strong> 
+        {% if abonnement.est_actif %} 
+            <span style="color:green;">Actif jusqu'au {{ abonnement.date_fin }}</span>
+        {% else %}
+            <span style="color:red;">Expiré</span>
+        {% endif %}
+    </p>
+
+    <p><strong>Date de début :</strong> {{ abonnement.date_debut }}</p>
+    <p><strong>Date de fin :</strong> {{ abonnement.date_fin }}</p>
+
+    <hr style="margin:20px 0;">
+
+    <h3>Paiement de l’abonnement</h3>
+    <p>Pour prolonger votre abonnement, payez 500 FCFA (mois) via ce lien :</p>
+    <a href="{{ lien_paiement }}" target="_blank" style="display:inline-block; padding:10px 20px; background:#007bff; color:white; text-decoration:none; border-radius:5px;">Payer maintenant</a>
+
+    <hr style="margin:20px 0;">
+
+    <h3>Envoyer la preuve de paiement</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="padding:10px 20px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer;">Envoyer</button>
+    </form>
+
+    {% if abonnement.preuve_paiement %}
+        <p style="margin-top:15px;">Preuve envoyée : <a href="{{ abonnement.preuve_paiement.url }}" target="_blank">Voir fichier</a></p>
     {% endif %}
-</p>
-
-{% if not abonnement.est_actif %}
-<a href="{% if abonnement.type_utilisateur == 'prestataire' %}
-    https://pay.wave.com/m/M_ci_sSsHPGoJSRAa/c/ci/?amount=500
-{% else %}
-    https://pay.wave.com/m/M_ci_sSsHPGoJSRAa/c/ci/?amount=200
-{% endif %}" target="_blank" class="btn-renouveler">
-    Renouveler mon abonnement
-</a>
-{% endif %}
-
+</div>
 {% endblock %}

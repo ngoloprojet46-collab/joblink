@@ -92,29 +92,36 @@ class BoutiqueAdmin(admin.ModelAdmin):
 # ---------------------
 # Abonnements
 # ---------------------
+from django.contrib import admin
+from django.utils.html import format_html
+from django.urls import reverse
+from .models import Abonnement
+
 @admin.register(Abonnement)
 class AbonnementAdmin(admin.ModelAdmin):
-    list_display = ('user', 'type_utilisateur', 'date_debut', 'date_fin', 'actif')
-    list_filter = ('type_utilisateur', 'actif')
-
-    # Correction importante
-    search_fields = ('user__username', 'user__email')
-
+    list_display = ('user', 'date_debut', 'date_fin', 'actif', 'preuve_paiement', 'renouveler_abonnement_bouton')
     readonly_fields = ('date_debut',)
+    search_fields = ('user_username', 'user_email')
 
+    # Filtrer pour ne voir que les prestataires
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(user__role='prestataire')
+
+    # Action globale (multi-sélection) pour prolonger
     actions = ['prolonger_abonnement']
 
     def prolonger_abonnement(self, request, queryset):
         for abonnement in queryset:
             abonnement.prolonger(30)
         self.message_user(request, "Abonnement(s) prolongé(s) de 30 jours")
-    prolonger_abonnement.short_description = "Prolonger de 30 jours"
+    prolonger_abonnement.short_description = "Prolonger les abonnements sélectionnés de 30 jours"
 
-
-# ---------------------
-# Services, Commandes, Paiements, Notifications
-# ---------------------
-admin.site.register(Service)
-admin.site.register(Commande)
-admin.site.register(Paiement)
-admin.site.register(Notification)
+    # Bouton individuel dans la liste
+    def renouveler_abonnement_bouton(self, obj):
+        url = reverse('renouveler_abonnement_admin', args=[obj.id])
+        return format_html(
+            '<a class="button" style="padding:3px 8px; background-color:#0d6efd; color:white; border-radius:3px; text-decoration:none;" href="{}">Renouveler</a>',
+            url
+        )
+    renouveler_abonnement_bouton.short_description = 'Renouveler'

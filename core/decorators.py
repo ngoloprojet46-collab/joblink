@@ -7,21 +7,21 @@ def abonnement_actif_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
 
-        # 🔹 Si l'utilisateur n'est pas connecté → login
         if not request.user.is_authenticated:
             return redirect('login')
 
-        # 🔹 Le superuser n'a JAMAIS besoin d'un abonnement
         if request.user.is_superuser:
             return view_func(request, *args, **kwargs)
 
-        # 🔹 Vérifier si l'utilisateur a un abonnement
+        # 🔹 Les demandeurs n'ont PAS besoin d'abonnement
+        if hasattr(request.user, 'demandeur'):
+            return view_func(request, *args, **kwargs)
+
         try:
             abonnement = request.user.abonnement
         except Abonnement.DoesNotExist:
             return redirect('gerer_abonnement')
 
-        # 🔹 Vérifier si l'abonnement est actif et non expiré
         if not abonnement.actif or abonnement.date_fin < timezone.now().date():
             return redirect('gerer_abonnement')
 
