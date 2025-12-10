@@ -32,41 +32,64 @@ from django.db.models import Q
 from .models import ConversationMessage
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
-from .models import Abonnement
+# core/views.py
 import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.utils import timezone
+from .models import Abonnement, User
+
 
 @csrf_exempt
 def wave_webhook(request):
     """
-    Wave envoie les infos du paiement ici.
-    Cette version vérifie que la requête est POST et que le JSON contient bien les infos nécessaires.
+    Webhook pour recevoir les notifications de paiement Wave.
+    Testé pour POST uniquement. 
     """
+    # Log de la méthode reçue pour débogage
+    print(f"[Wave Webhook] Méthode reçue: {request.method}")
+
     if request.method != "POST":
         return JsonResponse({"status": "method not allowed"}, status=405)
 
+    # Vérifier le format JSON
     try:
-        # On suppose que Wave envoie un JSON
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return JsonResponse({"status": "invalid JSON"}, status=400)
+        print("[Wave Webhook] Erreur JSON")
+        return JsonResponse({"status": "invalid json"}, status=400)
 
     user_id = data.get("user_id")
     montant = data.get("amount")
-    statut_paiement = data.get("status")  # exemple : 'success', 'failed', etc.
 
-    if not user_id or not montant or statut_paiement != "success":
-        return JsonResponse({"status": "missing or invalid data"}, status=400)
+    if not user_id or not montant:
+        return JsonResponse({"status": "missing parameters"}, status=400)
 
+    # Récupérer l'abonnement ou le créer si absent
     try:
-        abonnement = Abonnement.objects.get(user__id=user_id)
-        # Prolonger de 30 jours seulement si le paiement est validé
-        abonnement.prolonger(30)
-        return JsonResponse({"status": "ok"})
-    except Abonnement.DoesNotExist:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        print(f"[Wave Webhook] Utilisateur {user_id} introuvable")
         return JsonResponse({"status": "user not found"}, status=404)
+
+    abonnement, created = Abonnement.objects.get_or_create(
+        user=user,
+        defaults={
+            "type_utilisateur": user.role,
+            "date_debut": timezone.now().date(),
+            "date_fin": timezone.now().date() + timezone.timedelta(days=30),
+            "actif": True,
+        }
+    )
+
+    if not created:
+        # Prolonger l'abonnement de 30 jours si déjà existant
+        abonnement.prolonger(30)
+        print(f"[Wave Webhook] Abonnement de {user.username} prolongé de 30 jours")
+    else:
+        print(f"[Wave Webhook] Abonnement créé pour {user.username}")
+
+    return JsonResponse({"status": "ok", "user": user.username})
 
 
 @login_required
