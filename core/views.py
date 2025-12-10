@@ -32,36 +32,49 @@ from django.db.models import Q
 from .models import ConversationMessage
 
 
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from .models import Abonnement
+import json
 
 @csrf_exempt
 def wave_webhook(request):
     """
     Wave envoie les infos du paiement ici.
+    Cette version vérifie que la requête est POST et que le JSON contient bien les infos nécessaires.
     """
-    if request.method == "POST":
-        data = request.POST  # ou json.loads(request.body) si JSON
-        user_id = data.get("user_id")  # À récupérer selon ton intégration Wave
-        montant = data.get("amount")
+    if request.method != "POST":
+        return JsonResponse({"status": "method not allowed"}, status=405)
 
-        try:
-            abonnement = Abonnement.objects.get(user__id=user_id)
-            # Prolonger de 30 jours
-            abonnement.prolonger(30)
-            return JsonResponse({"status": "ok"})
-        except Abonnement.DoesNotExist:
-            return JsonResponse({"status": "user not found"}, status=404)
-    
-    return JsonResponse({"status": "method not allowed"}, status=405)
+    try:
+        # On suppose que Wave envoie un JSON
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "invalid JSON"}, status=400)
+
+    user_id = data.get("user_id")
+    montant = data.get("amount")
+    statut_paiement = data.get("status")  # exemple : 'success', 'failed', etc.
+
+    if not user_id or not montant or statut_paiement != "success":
+        return JsonResponse({"status": "missing or invalid data"}, status=400)
+
+    try:
+        abonnement = Abonnement.objects.get(user__id=user_id)
+        # Prolonger de 30 jours seulement si le paiement est validé
+        abonnement.prolonger(30)
+        return JsonResponse({"status": "ok"})
+    except Abonnement.DoesNotExist:
+        return JsonResponse({"status": "user not found"}, status=404)
 
 
 @login_required
 def renouveler_abonnement(request):
+    """
+    Affiche la page de renouvellement de l'abonnement.
+    """
     return render(request, "renouveler_abonnement.html")
-
-
 
 
 # Page d'accueil
@@ -623,10 +636,29 @@ def voir_prestataire_depuis_notification(request, notif_id):
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+from django.shortcuts import render, redirect
+from .models import Abonnement
+from django.contrib.auth.decorators import login_required
+from datetime import date, timedelta
+
 @login_required
 def gerer_abonnement(request):
-    abonnement = request.user.abonnement  # On récupère l'abonnement lié à l'utilisateur
-    return render(request, "core/gerer_abonnement.html", {"abonnement": abonnement})
+    # Essaye de récupérer l'abonnement
+    abonnement, created = Abonnement.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'type_utilisateur': request.user.role,
+            'date_debut': date.today(),
+            'date_fin': date.today() + timedelta(days=7),
+            'actif': True,
+        }
+    )
+
+    # Si l'abonnement n'était pas actif, tu peux l'afficher comme expiré
+    context = {
+        'abonnement': abonnement,
+    }
+    return render(request, 'core/gerer_abonnement.html', context)
 
 
 
