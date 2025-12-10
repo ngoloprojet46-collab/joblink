@@ -6,6 +6,9 @@ from .models import (
     Notification, Abonnement, Avis, Boutique
 )
 
+from django.utils.html import format_html
+from django.urls import reverse
+
 # ---------------------
 # Historique (LogEntry)
 # ---------------------
@@ -72,7 +75,7 @@ class BoutiqueAdmin(admin.ModelAdmin):
     list_filter = ('categorie', 'date_creation')
     
     # recherche dans prestataire.user.username
-    search_fields = ('nom', 'prestataire_user_username')
+    search_fields = ('nom', 'prestataire__user__username')
 
     readonly_fields = ('date_creation',)
 
@@ -92,16 +95,13 @@ class BoutiqueAdmin(admin.ModelAdmin):
 # ---------------------
 # Abonnements
 # ---------------------
-from django.contrib import admin
-from django.utils.html import format_html
-from django.urls import reverse
-from .models import Abonnement
+
 
 @admin.register(Abonnement)
 class AbonnementAdmin(admin.ModelAdmin):
     list_display = ('user', 'date_debut', 'date_fin', 'actif', 'preuve_paiement', 'renouveler_abonnement_bouton')
     readonly_fields = ('date_debut',)
-    search_fields = ('user_username', 'user_email')
+    search_fields = ('user__username', 'user__email')
 
     # Filtrer pour ne voir que les prestataires
     def get_queryset(self, request):
@@ -125,3 +125,43 @@ class AbonnementAdmin(admin.ModelAdmin):
             url
         )
     renouveler_abonnement_bouton.short_description = 'Renouveler'
+
+
+    # ---------------------
+# Gestion des Services
+# ---------------------
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('titre', 'prestataire', 'categorie', 'ville', 'date_publication')
+    search_fields = ('titre', 'categorie', 'ville', 'prestataire__user__username')
+    list_filter = ('categorie', 'ville', 'date_publication')
+
+
+# ---------------------
+# Gestion des Commandes
+# ---------------------
+@admin.register(Commande)
+class CommandeAdmin(admin.ModelAdmin):
+    list_display = ('demandeur','service', 'client', 'date_commande', 'statut')
+    search_fields = ('demandeur_userusername', 'service_titre')
+    list_filter = ('statut', 'date_commande')
+
+
+# ---------------------
+# Paiements
+# ---------------------
+@admin.register(Paiement)
+class PaiementAdmin(admin.ModelAdmin):
+    list_display = ('commande', 'montant', 'date_paiement', 'statut')
+    search_fields = ('commande_service_titre',)
+    list_filter = ('statut', 'date_paiement')
+
+
+# ---------------------
+# Notifications
+# ---------------------
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'prestataire', 'message', 'lue', 'date')
+    search_fields = ('user__username', 'message')
+    list_filter = ('lue', 'date')
