@@ -31,7 +31,24 @@
     </form>
 
     {% if abonnement.preuve_paiement %}
-        <p style="margin-top:15px;">Preuve envoyée : <a href="{{ abonnement.preuve_paiement.url }}" target="_blank">Voir fichier</a></p>
+        <div style="margin-top:20px;">
+            <p><strong>Preuve envoyée :</strong></p>
+
+            {% if abonnement.preuve_paiement.url %}
+                {% if abonnement.preuve_paiement|slice:"-4:" == ".jpg" or abonnement.preuve_paiement|slice:"-4:" == ".png" or abonnement.preuve_paiement|slice:"-5:" == ".jpeg" %}
+                    <!-- AFFICHAGE IMAGE CLOUDINARY -->
+                    <img src="{{ abonnement.preuve_paiement.url }}" 
+                         style="max-width:100%; border-radius:8px; margin-top:10px;" 
+                         alt="Preuve de paiement">
+                {% else %}
+                    <!-- AFFICHAGE PDF OU AUTRE FICHIER -->
+                    <a href="{{ abonnement.preuve_paiement.url }}" target="_blank" 
+                       style="color:#007bff; text-decoration:underline;">
+                        Télécharger / Voir la preuve
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
     {% endif %}
 </div>
 {% endblock %}
