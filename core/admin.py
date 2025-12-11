@@ -119,12 +119,14 @@ class AbonnementAdmin(admin.ModelAdmin):
 
     # Bouton individuel dans la liste
     def renouveler_abonnement_bouton(self, obj):
+        # Ici on ajoute le "core" pour que l'URL corresponde à ton path
         url = reverse('renouveler_abonnement_admin', args=[obj.id])
         return format_html(
             '<a class="button" style="padding:3px 8px; background-color:#0d6efd; color:white; border-radius:3px; text-decoration:none;" href="{}">Renouveler</a>',
             url
         )
     renouveler_abonnement_bouton.short_description = 'Renouveler'
+
 
 
     # ---------------------
@@ -140,12 +142,45 @@ class ServiceAdmin(admin.ModelAdmin):
 # ---------------------
 # Gestion des Commandes
 # ---------------------
+from django.contrib import admin
+from .models import Commande
+
 @admin.register(Commande)
 class CommandeAdmin(admin.ModelAdmin):
-    list_display = ('demandeur','service', 'client', 'date_commande', 'statut')
-    search_fields = ('demandeur_userusername', 'service_titre')
+    list_display = (
+        'demandeur',
+        'service', 
+        'prestataire', 
+        'telephone_service',   # ← téléphone du service
+        'telephone_prestataire',  # ← téléphone du prestataire
+        'statut',
+        'date_commande'
+        
+    )
+    
+    list_display_links = ('service',)   # rend le service cliquable
+    
+    search_fields = (
+        'demandeur_user_username',
+        'service__titre',
+        'service_prestataireuser_username'
+    )
     list_filter = ('statut', 'date_commande')
 
+    # Méthode pour afficher le prestataire
+    def prestataire(self, obj):
+        return obj.service.prestataire.user.username
+    prestataire.short_description = "Prestataire"
+
+    # Méthode pour afficher le téléphone du prestataire
+    def telephone_prestataire(self, obj):
+        return obj.service.prestataire.telephone
+    telephone_prestataire.short_description = "Téléphone Prestataire"
+
+    # Méthode pour afficher le téléphone du service
+    def telephone_service(self, obj):
+        return obj.service.telephone
+    telephone_service.short_description = "Téléphone Service"
 
 # ---------------------
 # Paiements
@@ -160,8 +195,17 @@ class PaiementAdmin(admin.ModelAdmin):
 # ---------------------
 # Notifications
 # ---------------------
+from django.contrib import admin
+from django.db.models import Q
+from .models import Notification
+
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('user', 'prestataire', 'message', 'lue', 'date')
     search_fields = ('user__username', 'message')
     list_filter = ('lue', 'date')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filtrer uniquement les notifications de commandes
+        return qs.filter(Q(message__icontains='commander') | Q(message__icontains='acceptée'))

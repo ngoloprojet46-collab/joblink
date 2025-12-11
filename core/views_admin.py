@@ -31,10 +31,16 @@ def redirect_after_login(request):
 
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from .models import Abonnement
+from django.urls import reverse
+from core.models import Abonnement  # adapte selon ton app
 
+@staff_member_required
 def renouveler_abonnement_admin(request, abonnement_id):
     abonnement = get_object_or_404(Abonnement, id=abonnement_id)
     abonnement.prolonger(30)
+    abonnement.save()
     messages.success(request, f"L'abonnement de {abonnement.user.username} a été prolongé de 30 jours.")
-    return redirect('/admin/core/abonnement/')  # revenir à la liste admin
+    return redirect(request.META.get('HTTP_REFERER', '/admin/'))
+
+
+

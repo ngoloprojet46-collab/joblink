@@ -22,11 +22,19 @@ from django.urls import path, include
 from pwa.views import manifest, service_worker
 from django.views.generic import TemplateView
 from django.views.decorators.cache import cache_control
+from core import views_admin  # ou l’app qui contient ta vue
+
 
 
 
 urlpatterns = [
     # ... tes autres URLs ...
+    path(
+    'admin/core/abonnement/<int:abonnement_id>/renouveler/',
+    views_admin.renouveler_abonnement_admin,
+    name='renouveler_abonnement_admin'
+),
+
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('accounts/', include('django.contrib.auth.urls')), 

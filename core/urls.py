@@ -16,7 +16,9 @@ from .views import (
 from django.urls import path
 from . import views_admin  # maintenant ça fonctionne
 urlpatterns = [
-    path('admin/core/abonnement/<int:abonnement_id>/renouveler/', views_admin.renouveler_abonnement_admin, name='renouveler_abonnement_admin'),
+    
+
+
 
     #path('test-email/', views.test_email, name='test_email'),
     path('renouveler-abonnement/', views.renouveler_abonnement, name='renouveler_abonnement'),
