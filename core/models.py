@@ -140,7 +140,7 @@ class Abonnement(models.Model):
     date_debut = models.DateField(auto_now_add=True)
     date_fin = models.DateField(blank=True, null=True)
     actif = models.BooleanField(default=True)
-    preuve_paiement = models.FileField(upload_to='preuves_abonnement/', blank=True, null=True)
+    preuve_paiement = CloudinaryField('preuve de paiement', blank=True, null=True)
     note_admin = models.TextField(blank=True, null=True)  # Optionnel, pour commentaire admin
 
     def save(self, *args, **kwargs):
@@ -162,6 +162,11 @@ class Abonnement(models.Model):
 
     def est_actif(self):
         return self.actif and self.date_fin >= date.today()
+
+    def __str__(self):
+        username = getattr(self.user, 'username', 'Utilisateur')
+        return f"Abonnement {username} ({'actif' if self.est_actif() else 'inactif'})"
+
 
 
 class Avis(models.Model):

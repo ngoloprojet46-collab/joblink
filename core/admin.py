@@ -99,7 +99,14 @@ class BoutiqueAdmin(admin.ModelAdmin):
 
 @admin.register(Abonnement)
 class AbonnementAdmin(admin.ModelAdmin):
-    list_display = ('user', 'date_debut', 'date_fin', 'actif', 'preuve_paiement', 'renouveler_abonnement_bouton')
+    list_display = (
+        'user',
+        'date_debut',
+        'date_fin',
+        'actif',
+        'afficher_preuve_paiement',
+        'renouveler_abonnement_bouton'
+    )
     readonly_fields = ('date_debut',)
     search_fields = ('user__username', 'user__email')
 
@@ -108,7 +115,7 @@ class AbonnementAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.filter(user__role='prestataire')
 
-    # Action globale (multi-sélection) pour prolonger
+    # Action globale
     actions = ['prolonger_abonnement']
 
     def prolonger_abonnement(self, request, queryset):
@@ -117,15 +124,22 @@ class AbonnementAdmin(admin.ModelAdmin):
         self.message_user(request, "Abonnement(s) prolongé(s) de 30 jours")
     prolonger_abonnement.short_description = "Prolonger les abonnements sélectionnés de 30 jours"
 
-    # Bouton individuel dans la liste
+    # Bouton individuel
     def renouveler_abonnement_bouton(self, obj):
-        # Ici on ajoute le "core" pour que l'URL corresponde à ton path
         url = reverse('renouveler_abonnement_admin', args=[obj.id])
         return format_html(
             '<a class="button" style="padding:3px 8px; background-color:#0d6efd; color:white; border-radius:3px; text-decoration:none;" href="{}">Renouveler</a>',
             url
         )
     renouveler_abonnement_bouton.short_description = 'Renouveler'
+
+    # ✅ Méthode pour afficher la preuve
+    def afficher_preuve_paiement(self, obj):
+        if obj.preuve_paiement:
+            return format_html('<a href="{}" target="_blank">Voir</a>', obj.preuve_paiement.url)
+        return "Aucune preuve"
+    afficher_preuve_paiement.short_description = "Preuve de paiement"
+
 
 
 
