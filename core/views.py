@@ -1018,3 +1018,9 @@ def conversation_demandeur(request, service_id, prestataire_id):
         'prestataire': prestataire_user,
     })
 
+
+from django.shortcuts import render
+
+def apropos(request):
+    return render(request, 'apropos.html')
+

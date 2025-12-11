@@ -18,6 +18,7 @@ from . import views_admin  # maintenant ça fonctionne
 urlpatterns = [
     
 
+    path('apropos/', views.apropos, name='apropos'),
 
 
     #path('test-email/', views.test_email, name='test_email'),
