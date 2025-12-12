@@ -192,6 +192,11 @@ class AbonnementAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank">Voir</a>', obj.preuve_paiement.url)
         return "Aucune preuve"
     afficher_preuve_paiement.short_description = "Preuve de paiement"
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.filter(user__role='prestataire')
+        return qs.order_by('-preuve_paiement', '-date_debut')  # Preuve d’abord, puis récents
+
 
 
 

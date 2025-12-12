@@ -32,15 +32,27 @@ def redirect_after_login(request):
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.urls import reverse
-from core.models import Abonnement  # adapte selon ton app
+from django.contrib.admin.views.decorators import staff_member_required
+from core.models import Abonnement
 
 @staff_member_required
 def renouveler_abonnement_admin(request, abonnement_id):
     abonnement = get_object_or_404(Abonnement, id=abonnement_id)
+    
+    # Prolonger l'abonnement
     abonnement.prolonger(30)
-    abonnement.save()
-    messages.success(request, f"L'abonnement de {abonnement.user.username} a été prolongé de 30 jours.")
+    
+    # Supprimer la preuve de paiement si elle existe
+    if abonnement.preuve_paiement:
+        try:
+            # Supprime le fichier de Cloudinary
+            abonnement.preuve_paiement.delete()
+        except Exception as e:
+            messages.warning(request, f"Impossible de supprimer la preuve : {e}")
+        abonnement.preuve_paiement = None
+        abonnement.save()
+    
+    messages.success(request, f"L'abonnement de {abonnement.user.username} a été prolongé de 30 jours et la preuve de paiement a été supprimée.")
     return redirect(request.META.get('HTTP_REFERER', '/admin/'))
-
 
 
