@@ -8,6 +8,7 @@ from .models import (
 
 from django.utils.html import format_html
 from django.urls import reverse
+from django.db.models import BooleanField, Case, When, Value
 
 # ---------------------
 # Historique (LogEntry)
@@ -192,11 +193,22 @@ class AbonnementAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank">Voir</a>', obj.preuve_paiement.url)
         return "Aucune preuve"
     afficher_preuve_paiement.short_description = "Preuve de paiement"
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.filter(user__role='prestataire')
-        return qs.order_by('-preuve_paiement', '-date_debut')  # Preuve d’abord, puis récents
-
+        
+        # Crée un champ temporaire : True si preuve existe, sinon False
+        qs = qs.annotate(
+            a_paye=Case(
+                When(preuve_paiement__isnull=False, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+        
+        # Trie d’abord ceux qui ont une preuve, puis par date_debut
+        return qs.order_by('-a_paye', '-date_debut')
 
 
 
