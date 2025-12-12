@@ -15,26 +15,45 @@ class PreuvePaiementForm(forms.ModelForm):
 
 
 
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
+from .models import User
+
+
 class UserRegisterForm(UserCreationForm):
     ROLE_CHOICES = [
         ('prestataire', 'Prestataire'),
         ('demandeur', 'Demandeur'),
     ]
+
     role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect)
     phone = forms.CharField(label="Téléphone", required=True)
 
     password1 = forms.CharField(
         label="Mot de passe",
-        widget=forms.PasswordInput(attrs={'class': 'form-control password-field'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        required=True
     )
+
     password2 = forms.CharField(
         label="Confirmer le mot de passe",
-        widget=forms.PasswordInput(attrs={'class': 'form-control password-field'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        required=True
     )
 
     class Meta:
         model = User
         fields = ['username', 'email', 'phone', 'role', 'password1', 'password2', 'photo']
+
+    # ✅ Validation MINIMALE : juste vérifier que les deux mots de passe sont identiques
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+
+        if password1 != password2:
+            raise forms.ValidationError("Les mots de passe ne correspondent pas")
+
+        return password2
 
 
 class ProfilUpdateForm(forms.ModelForm):
