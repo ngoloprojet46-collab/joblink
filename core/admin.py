@@ -38,14 +38,67 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('username', 'email', 'phone')
 
 
-# ---------------------
-# Gestion des Prestataires
-# ---------------------
 @admin.register(Prestataire)
 class PrestataireAdmin(admin.ModelAdmin):
-    list_display = ('user', 'competence', 'experience', 'localisation', 'note_moyenne')
+    list_display = (
+        'user',
+        'competence',
+        'experience',
+        'localisation',
+        'note_moyenne',
+        'date_debut_abonnement',
+        'date_fin_abonnement',
+        'abonnement_actif',
+        'creer_abonnement_bouton',   # 👉 AJOUT
+    )
+
     search_fields = ('user__username', 'competence', 'localisation')
 
+    # Récupérer date_debut depuis Abonnement
+    def date_debut_abonnement(self, obj):
+        try:
+            return obj.user.abonnement.date_debut
+        except:
+            return "—"
+    date_debut_abonnement.short_description = "Début abonnement"
+
+    # Récupérer date_fin depuis Abonnement
+    def date_fin_abonnement(self, obj):
+        try:
+            return obj.user.abonnement.date_fin
+        except:
+            return "—"
+    date_fin_abonnement.short_description = "Fin abonnement"
+
+    # Voir si l’abonnement est actif
+    def abonnement_actif(self, obj):
+        try:
+            return "Oui" if obj.user.abonnement.est_actif() else "Non"
+        except:
+            return "—"
+    abonnement_actif.short_description = "Abonnement actif ?"
+
+    # 👉 Bouton "Créer abonnement"
+    def creer_abonnement_bouton(self, obj):
+        # S'il n'a PAS d'abonnement → afficher bouton
+        abonnement = getattr(obj.user, 'abonnement', None)
+        if abonnement is None:
+            url = reverse("admin:core_abonnement_add") + f"?user={obj.user.id}"
+            return format_html(
+                '<a class="button" style="padding:3px 8px; background:#28a745; color:white; border-radius:3px;" href="{}">Créer</a>',
+                url
+            )
+        
+        # Sinon → afficher un texte
+        return "Déjà créé"
+    
+    creer_abonnement_bouton.short_description = "Créer abonnement"
+
+    def response_add(self, request, obj, post_url_continue=None):
+        # Rester sur la page d'ajout après l'enregistrement
+        request.POST = request.POST.copy()
+        request.POST["_addanother"] = "yes"
+        return super().response_add(request, obj, post_url_continue)
 
 # ---------------------
 # Gestion des Demandeurs
