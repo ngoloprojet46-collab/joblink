@@ -38,6 +38,9 @@ from .models import Abonnement
 from .forms import PreuvePaiementForm
 from django.contrib import messages
 
+from .utils import envoyer_email
+from django.utils import timezone
+
 @login_required
 def gerer_abonnement(request):
     try:
@@ -462,31 +465,60 @@ def supprimer_service(request, service_id):
 
     return render(request, 'core/supprimer_service.html', {'service': service})
 
+
+
+
+from django.utils import timezone  # ✅ Ajouter ceci en haut de core/views.py
+
+from .utils import envoyer_email
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Service, Commande, Notification
+
 @login_required
 def commander_service(request, service_id):
     service = get_object_or_404(Service, id=service_id)
-
-    # ✅ Vérifie si le demandeur connecté a déjà commandé ce service
     demandeur = getattr(request.user, 'demandeur', None)
+
     if not demandeur:
         messages.error(request, "Seuls les demandeurs peuvent commander un service.")
         return redirect('home')
 
-    commande_existante = Commande.objects.filter(service=service, demandeur=demandeur).exists()
-    if commande_existante:
+    if Commande.objects.filter(service=service, demandeur=demandeur).exists():
         messages.warning(request, "Vous avez déjà commandé ce service ❗")
         return redirect('dashboard')
 
-    # ✅ Création de la commande
-    Commande.objects.create(service=service, demandeur=demandeur)
+    # Création de la commande
+    commande = Commande.objects.create(
+        service=service,
+        demandeur=demandeur,
+        date_commande=timezone.now()  # ✅ Utilisation de timezone.now()
+    )
+
+    # 📧 Email au prestataire
+    prestataire_user = service.prestataire.user
+    if prestataire_user.email:
+        envoyer_email(
+            sujet="📩 Nouveau service commandé sur JobLink",
+            template_html="emails/commande_prestataire.html",
+            context={
+                "prestataire": prestataire_user.username,
+                "service": service.titre,
+                "dashboard_url": request.build_absolute_uri("/tableau-prestataire/"),
+                "year": timezone.now().year,
+            },
+            destinataire=prestataire_user.email
+        )
+
     messages.success(request, "Votre commande a été enregistrée avec succès ✅")
     return redirect('dashboard')
+
 
 @login_required
 def accepter_commande(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
 
-    # Vérifie que c’est bien le prestataire
     if commande.service.prestataire.user != request.user:
         messages.error(request, "Action non autorisée.")
         return redirect('tableau_prestataire')
@@ -495,13 +527,11 @@ def accepter_commande(request, commande_id):
     commande.save()
 
     demandeur_user = commande.demandeur.user
-
-    # 🔥 Téléphone du demandeur
     numero_demandeur = demandeur_user.phone if demandeur_user.phone else "Numéro non renseigné"
 
-    # 🔥 Notification envoyée au prestataire
+    # Notification pour le prestataire
     Notification.objects.create(
-        user=commande.service.prestataire.user,   # destinataire = prestataire
+        user=commande.service.prestataire.user,
         prestataire=commande.service.prestataire,
         message=(
             f"Nouvelle commande acceptée pour le service « {commande.service.titre} ».\n"
@@ -510,7 +540,21 @@ def accepter_commande(request, commande_id):
         )
     )
 
-    # 🔥 Notification envoyée au demandeur (déjà existante chez toi)
+    # Email pour le demandeur
+    if demandeur_user.email:
+        envoyer_email(
+            sujet="✅ Votre commande a été acceptée",
+            template_html="emails/commande_acceptee_demandeur.html",
+            context={
+                "demandeur": demandeur_user.username,
+                "service": commande.service.titre,
+                "telephone": commande.service.prestataire.telephone,
+                "year": timezone.now().year,
+            },
+            destinataire=demandeur_user.email
+        )
+
+    # Notification pour le demandeur
     Notification.objects.create(
         user=demandeur_user,
         prestataire=commande.service.prestataire,
@@ -522,6 +566,8 @@ def accepter_commande(request, commande_id):
 
     messages.success(request, "Commande acceptée et notifications envoyées.")
     return redirect('tableau_prestataire')
+
+
 
 @login_required
 def liste_notifications_prestataire(request):

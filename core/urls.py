@@ -13,6 +13,7 @@ from .views import (
     # ... autres vues
 )
 
+        
 from django.urls import path
 from . import views_admin  # maintenant ça fonctionne
 urlpatterns = [

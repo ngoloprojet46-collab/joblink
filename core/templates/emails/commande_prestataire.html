@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+  <div style="max-width:600px;margin:auto;background:#fff;border-radius:8px;padding:20px;">
+    <h2 style="color:#0a7cff;">📩 Nouvelle commande sur JobLink</h2>
+
+    <p>Bonjour <strong>{{ prestataire }}</strong>,</p>
+
+    <p>
+      Votre service <strong>{{ service }}</strong> vient d’être commandé.
+    </p>
+
+    <p>
+      Connectez-vous à votre espace prestataire pour accepter ou refuser la commande.
+    </p>
+
+    <a href="{{ dashboard_url }}"
+       style="display:inline-block;margin-top:15px;padding:12px 20px;
+              background:#0a7cff;color:#fff;text-decoration:none;border-radius:5px;">
+      Accéder à JobLink
+    </a>
+
+    <hr style="margin:30px 0;">
+    <p style="font-size:12px;color:#777;">
+      © {{ year }} JobLink — Plateforme de prestation et de services
+    </p>
+  </div>
+</body>
+</html>

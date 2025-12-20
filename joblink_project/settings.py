@@ -11,8 +11,8 @@ AUTH_PASSWORD_VALIDATORS = []
 # Sécurité
 # -------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
-#DEBUG = True
+#DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
@@ -21,6 +21,19 @@ ALLOWED_HOSTS = [
     'joblink-fdot.onrender.com',     # ton lien actuel
 ]
 
+
+# =========================
+# EMAIL - BREVO (SMTP)
+# =========================
+
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 # -------------------------
 # Applications
@@ -162,4 +175,3 @@ PWA_APP_ICONS = [
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"  # ou Path(BASE_DIR, "staticfiles") selon ta version
-
