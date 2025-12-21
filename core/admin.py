@@ -1,42 +1,74 @@
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib import messages
+from django.urls import reverse
+from django.utils.html import format_html
+from django.db.models import BooleanField, Case, When, Value
+from django.contrib.sites.shortcuts import get_current_site
+
 from .models import (
     User, Prestataire, Demandeur, Service, Commande, Paiement,
     Notification, Abonnement, Avis, Boutique
 )
 
-from django.utils.html import format_html
-from django.urls import reverse
-from django.db.models import BooleanField, Case, When, Value
+from .utils import envoyer_email_global
 
 # ---------------------
-# Historique (LogEntry)
+# Historique admin
 # ---------------------
 admin.site.register(LogEntry)
 
 
-# ----------------------------------------------------
-# Gestion du User (CustomUserAdmin remplacé proprement)
-# ----------------------------------------------------
+# ====================================================
+# ACTION ADMIN : EMAIL GLOBAL
+# ====================================================
+def envoyer_mail_global(modeladmin, request, queryset):
+    site_url = f"https://{get_current_site(request).domain}"
+
+    envoyer_email_global(
+        users=queryset,
+        subject="📢 Information importante – JobLink",
+        message=(
+        "Nous souhaitons vous informer qu’une nouvelle mise à jour a été effectuée sur votre espace JobLink. "
+        "Dorénavant, vous recevrez des notifications par email pour chaque action réalisée sur votre compte. "
+        "Nous vous invitons à continuer d’utiliser JobLink (Côte D’Ivoire) pour toutes vos mises en relation professionnelles. "
+        "Merci de votre confiance. "
+        "L’équipe JobLink"
+    ),
+        site_url=site_url,
+    )
+
+    messages.success(
+        request,
+        f"Email envoyé avec succès à {queryset.count()} utilisateur(s)."
+    )
+
+envoyer_mail_global.short_description = "📧 Envoyer un email global"
+
+
+# ====================================================
+# USER ADMIN
+# ====================================================
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Informations personnelles', {'fields': (
-            'first_name', 'last_name', 'email', 'phone', 'photo'
-        )}),
+        ('Informations personnelles', {
+            'fields': ('first_name', 'last_name', 'email', 'phone', 'photo')
+        }),
         ('Rôle', {'fields': ('role',)}),
-        ('Permissions', {'fields': (
-            'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'
-        )}),
-        ('Dates importantes', {'fields': (
-            'last_login', 'date_joined'
-        )}),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        }),
+        ('Dates importantes', {
+            'fields': ('last_login', 'date_joined')
+        }),
     )
 
     list_display = ('username', 'role', 'email', 'phone', 'is_staff')
     search_fields = ('username', 'email', 'phone')
+    actions = [envoyer_mail_global]
 
 
 @admin.register(Prestataire)
