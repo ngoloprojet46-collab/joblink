@@ -19,6 +19,53 @@ from .utils import envoyer_email_global
 # ---------------------
 admin.site.register(LogEntry)
 
+from django.contrib import admin
+from django.utils import timezone
+from datetime import timedelta
+
+from django.contrib.admin import SimpleListFilter
+from django.utils.timezone import now, timedelta
+
+class NouvelUtilisateurFilter(admin.SimpleListFilter):
+    title = "Nouveaux utilisateurs"
+    parameter_name = "nouveau"
+
+    def lookups(self, request, model_admin):
+        return (
+            ('oui', 'Nouveaux (≤ 2 jours)'),
+            ('non', 'Anciens'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'oui':
+            return queryset.filter(
+                date_joined__gte=timezone.now() - timedelta(days=2)
+            )
+        if self.value() == 'non':
+            return queryset.filter(
+                date_joined__lt=timezone.now() - timedelta(days=2)
+            )
+        return queryset
+
+class StatutConnexionFilter(SimpleListFilter):
+    title = "Statut de connexion"
+    parameter_name = "en_ligne"
+
+    def lookups(self, request, model_admin):
+        return (
+            ('oui', 'Connecté'),
+            ('non', 'Non connecté'),
+        )
+
+    def queryset(self, request, queryset):
+        limite = now() - timedelta(minutes=15)
+
+        if self.value() == 'oui':
+            return queryset.filter(last_login__gte=limite)
+        if self.value() == 'non':
+            return queryset.exclude(last_login__gte=limite)
+        return queryset
+
 
 # ====================================================
 # ACTION ADMIN : EMAIL GLOBAL
@@ -68,6 +115,13 @@ class UserAdmin(BaseUserAdmin):
 
     list_display = ('username', 'role', 'email', 'phone', 'is_staff')
     search_fields = ('username', 'email', 'phone')
+    list_filter = (
+        'role',
+        'is_staff',
+        'is_active',
+        NouvelUtilisateurFilter,
+        StatutConnexionFilter,
+    )
     actions = [envoyer_mail_global]
 
 
