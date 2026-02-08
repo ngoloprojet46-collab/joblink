@@ -80,6 +80,51 @@
 }
 </style>
 
+<style>
+.cta-section {
+    background: linear-gradient(135deg, #0a7cff, #4e54c8);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-box {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.cta-box.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cta-section h4 {
+    font-size: 1.5rem;
+}
+
+.cta-section p {
+    font-size: 1rem;
+}
+</style>
+
+<style>
+.cta-title {
+    color: #ffd700;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 
+        0 2px 6px rgba(0,0,0,0.7),
+        0 0 10px rgba(255,215,0,0.6);
+}
+</style>
+
+
+
 <!-- Section d’accueil avec image de fond -->
 <section class="hero-section py-5 text-center rounded-3 shadow-sm">
     <div class="overlay"></div>
@@ -258,4 +303,43 @@
         </div>
     </div>
 </section>
+
+{% if not user.is_authenticated %}
+<section id="cta-login" class="cta-section text-center py-4">
+    <div class="container">
+        <div class="cta-box shadow-lg rounded-4 p-4">
+            <h4 class="fw-bold mb-2 cta-title">
+                Connectez-vous pour accéder à toutes les fonctionnalités
+            </h4>
+            <p class="mb-3">
+                Découvrez plus de services, contactez les prestataires et publiez vos propres offres.
+            </p>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-2">
+                Se connecter
+            </a>
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">
+                Créer un compte
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const ctaBox = document.querySelector(".cta-box");
+
+    function revealCTA() {
+        const triggerPoint = window.innerHeight * 0.85;
+        const ctaTop = ctaBox.getBoundingClientRect().top;
+
+        if (ctaTop < triggerPoint) {
+            ctaBox.classList.add("show");
+        }
+    }
+
+    window.addEventListener("scroll", revealCTA);
+});
+</script>
+
 {% endblock %}

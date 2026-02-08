@@ -2,6 +2,12 @@
 {% block content %}
 <div class="container mt-5">
   <h2 class="mb-4 text-center">📩 Boîte de réception - Prestataire</h2>
+  <div class="mb-3">
+        <a href="{% url 'tableau_prestataire' %}" class="btn btn-outline-secondary">
+            ⬅ Retour
+        </a>
+    </div>
+
 
   {% if messages_reçus %}
     <ul class="list-group">

@@ -4,6 +4,13 @@
 
     <h2 class="text-center mb-4">📩 Boîte de réception</h2>
 
+    <div class="mb-3">
+        <a href="{% url 'tableau_demandeur' %}" class="btn btn-outline-secondary">
+            ⬅ Retour
+        </a>
+    </div>
+
+
     {% if messages_reçus %}
         <ul class="list-group">
             {% for msg in messages_reçus %}
