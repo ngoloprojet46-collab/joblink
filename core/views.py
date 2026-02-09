@@ -312,6 +312,8 @@ def service_list(request):
     query = request.GET.get('q', '').strip()
     ville = request.GET.get('ville', '').strip()
 
+    type_boutique = request.GET.get('type_boutique', '').strip()
+
     # Services disponibles uniquement
     services = Service.objects.filter(disponible=True).order_by('-date_publication')
 
@@ -326,6 +328,11 @@ def service_list(request):
     if ville:
         services = services.filter(ville=ville)
 
+    # 🔥 Nouveau filtre par type de boutique
+    if type_boutique:
+        services = services.filter(
+            prestataire__boutique__categorie=type_boutique
+        )
     # Pagination
     paginator = Paginator(services, 6)
     page_number = request.GET.get('page', 1)
@@ -353,7 +360,7 @@ def service_list(request):
 def services_feed(request):
     query = request.GET.get('q')
     ville = request.GET.get('ville')
-
+    type_boutique = request.GET.get('type_boutique')  # ✅ nouveau filtre
     services = Service.objects.filter(disponible=True).order_by('-date_publication')
 
     if query:
@@ -364,6 +371,11 @@ def services_feed(request):
 
     if ville:
         services = services.filter(ville=ville)
+
+    if type_boutique:
+        services = services.filter(
+            prestataire__boutique__categorie=type_boutique
+        )
 
     paginator = Paginator(services, 6)
     page_number = request.GET.get('page', 1)
@@ -386,6 +398,7 @@ def services_feed(request):
         'services': page_obj,
         'query': query,
         'ville': ville,
+        'type_boutique' : type_boutique,
         'villes': Service.VILLES_CI,
         'user_role': request.user.role if request.user.is_authenticated else None
     }

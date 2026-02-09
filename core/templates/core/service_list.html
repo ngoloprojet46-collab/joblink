@@ -17,6 +17,19 @@
             </select>
         </div>
 
+        <!-- Filtre par type de boutique -->
+        <div class="col-md-3">
+            <select name="type_boutique" class="form-select form-select-lg rounded-3">
+                <option value="">Tous les types</option>
+                <option value="emploi" {% if type_boutique == "emploi" %}selected{% endif %}>
+                    Emploi
+                </option>
+                <option value="vente" {% if type_boutique == "vente" %}selected{% endif %}>
+                    Vente
+                </option>
+            </select>
+        </div>
+
         <!-- Recherche -->
         <div class="col-md-6">
             <input type="text" name="q" class="form-control form-control-lg rounded-3"
@@ -78,8 +91,9 @@ function loadMoreServices() {
 
     const query = encodeURIComponent("{{ query|default:'' }}");
     const ville = encodeURIComponent("{{ ville|default:'' }}");
+    const type_boutique = encodeURIComponent("{{ type_boutique|default:'' }}");
 
-    fetch("{% url 'services_feed' %}?page=" + page + "&q=" + query + "&ville=" + ville, {
+    fetch("{% url 'services_feed' %}?page=" + page + "&q=" + query + "&ville=" + ville + "&type_boutique=" + type_boutique, {
         headers: {'X-Requested-With': 'XMLHttpRequest'}
     })
     .then(response => response.json())
