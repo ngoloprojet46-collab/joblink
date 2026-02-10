@@ -311,7 +311,6 @@ def redirection_dashboard(request):
 def service_list(request):
     query = request.GET.get('q', '').strip()
     ville = request.GET.get('ville', '').strip()
-
     type_boutique = request.GET.get('type_boutique', '').strip()
 
     # Services disponibles uniquement

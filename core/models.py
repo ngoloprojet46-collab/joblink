@@ -11,15 +11,36 @@ class User(AbstractUser):
         ('prestataire', 'Prestataire'),
         ('demandeur', 'Demandeur'),
     )
+
+    SOURCE_CHOICES = [
+        ('facebook', 'Facebook'),
+        ('whatsapp', 'WhatsApp'),
+        ('ami', 'Recommandation d’un ami'),
+        ('ecole', 'École / Université'),
+        ('tiktok', 'TikTok'),
+        ('autre', 'Autre'),
+    ]
+
+    AVIS_CHOICES = [
+        ('excellent', 'Excellent'),
+        ('bon', 'Bon'),
+        ('moyen', 'Moyen'),
+        ('mauvais', 'Mauvais'),
+    ]
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone = models.CharField(max_length=20, unique=True, null=True, blank=True)
-     # 🖼 Photo de profil avec Cloudinary
     photo = CloudinaryField("photo_profil", blank=True, null=True)
 
+    # 🔥 NOUVEAUX CHAMPS MARKETING
+    source = models.CharField(max_length=50, choices=SOURCE_CHOICES, blank=True, null=True)
+    avis_plateforme = models.CharField(max_length=20, choices=AVIS_CHOICES, blank=True, null=True)
+    suggestion = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.username} ({self.role})"
- 
+
+
 
 class Prestataire(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

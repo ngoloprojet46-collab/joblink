@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block title %}{{ service.titre }} - JobLink{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ service.titre }}" />
+<meta property="og:description" content="{{ service.description|truncatechars:150 }}" />
+<meta property="og:image" content="{% if service.image %}{{ service.image.url }}{% elif service.video %}{{ service.video.url }}{% else %}{% static 'default_service.png' %}{% endif %}" />
+<meta property="og:url" content="{{ request.build_absolute_uri }}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="JobLink" />
+{% endblock %}
+
+
 {% block content %}
 <div class="container mt-5">
     <div class="card shadow-lg border-0 rounded-4">

@@ -99,31 +99,83 @@ envoyer_mail_global.short_description = "📧 Envoyer un email global"
 # ====================================================
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
+
         ('Informations personnelles', {
-            'fields': ('first_name', 'last_name', 'email', 'phone', 'photo')
+            'fields': (
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+                'photo',
+            )
         }),
+
+        ('Questionnaire Marketing 📊', {
+            'fields': (
+                'source',
+                'avis_plateforme',
+                'suggestion',
+            )
+        }),
+
         ('Rôle', {'fields': ('role',)}),
+
         ('Permissions', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions'
+            )
         }),
+
         ('Dates importantes', {
             'fields': ('last_login', 'date_joined')
         }),
     )
 
-    list_display = ('username', 'role', 'email', 'phone', 'is_staff')
-    search_fields = ('username', 'email', 'phone')
+    # 🔥 AFFICHAGE LISTE ADMIN
+    list_display = (
+        'username',
+        'role',
+        'email',
+        'phone',
+        'source',
+        'avis_plateforme',
+        'suggestion_courte',  # ✅ ajouté
+        'is_staff'
+    )
+
+    search_fields = (
+        'username',
+        'email',
+        'phone',
+        'source',
+        'suggestion'
+    )
+
     list_filter = (
         'role',
+        'source',
+        'avis_plateforme',
         'is_staff',
         'is_active',
         NouvelUtilisateurFilter,
         StatutConnexionFilter,
     )
+
     actions = [envoyer_mail_global]
 
+    # 🔥 Méthode pour afficher suggestion raccourcie
+    def suggestion_courte(self, obj):
+        if obj.suggestion:
+            return obj.suggestion[:40] + "..."
+        return "-"
+    suggestion_courte.short_description = "Suggestion"
 
 @admin.register(Prestataire)
 class PrestataireAdmin(admin.ModelAdmin):

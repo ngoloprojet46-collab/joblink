@@ -153,6 +153,13 @@
                                                    onclick="return confirm('Supprimer ce service ?')">
                                                     Supprimer
                                                 </a>
+
+                                                <!-- ✅ BOUTON PARTAGER FACEBOOK -->
+                                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.scheme }}://{{ request.get_host }}{% url 'service_detail' service.id %}"
+                                                target="_blank"
+                                                class="btn btn-primary btn-sm">
+                                                    📢 Partager sur Facebook
+                                                </a>
                                             </td>
                                         </tr>
                                     {% endfor %}

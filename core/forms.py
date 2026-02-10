@@ -21,13 +21,49 @@ from .models import User
 
 
 class UserRegisterForm(UserCreationForm):
+
     ROLE_CHOICES = [
         ('prestataire', 'Prestataire'),
         ('demandeur', 'Demandeur'),
     ]
 
+    SOURCE_CHOICES = [
+        ('facebook', 'Facebook'),
+        ('whatsapp', 'WhatsApp'),
+        ('ami', 'Recommandation d’un ami'),
+        ('ecole', 'École / Université'),
+        ('tiktok', 'TikTok'),
+        ('autre', 'Autre'),
+    ]
+
+    AVIS_CHOICES = [
+        ('excellent', 'Excellent'),
+        ('bon', 'Bon'),
+        ('moyen', 'Moyen'),
+        ('mauvais', 'Mauvais'),
+    ]
+
     role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect)
     phone = forms.CharField(label="Téléphone", required=True)
+
+    # 🔥 Nouveaux champs
+    source = forms.ChoiceField(
+        choices=SOURCE_CHOICES,
+        label="Où avez-vous entendu parler de JobLink ?",
+        required=False
+    )
+
+    avis_plateforme = forms.ChoiceField(
+        choices=AVIS_CHOICES,
+        label="Comment trouvez-vous la plateforme ?",
+        required=False
+    )
+
+    suggestion = forms.CharField(
+        widget=forms.Textarea(attrs={'rows':3}),
+        required=False,
+        label="Suggestions (facultatif)"
+    )
 
     password1 = forms.CharField(
         label="Mot de passe",
@@ -43,9 +79,19 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'role', 'password1', 'password2', 'photo']
+        fields = [
+            'username',
+            'email',
+            'phone',
+            'role',
+            'photo',
+            'source',
+            'avis_plateforme',
+            'suggestion',
+            'password1',
+            'password2',
+        ]
 
-    # ✅ Validation MINIMALE : juste vérifier que les deux mots de passe sont identiques
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
@@ -54,7 +100,6 @@ class UserRegisterForm(UserCreationForm):
             raise forms.ValidationError("Les mots de passe ne correspondent pas")
 
         return password2
-
 
 class ProfilUpdateForm(forms.ModelForm):
     class Meta:
@@ -142,10 +187,34 @@ class BoutiqueForm(forms.ModelForm):
         model = Boutique
         fields = ['nom', 'description', 'categorie', 'image']
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de la boutique'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description de la boutique'}),
+            'nom': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nom de la boutique'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Description de la boutique'
+            }),
+            'categorie': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'   # 🔥 limite le choix aux images
+            }),
         }
 
+    # 🔒 Sécurité backend (empêche vidéos)
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+
+        if image:
+            if not image.content_type.startswith('image'):
+                raise forms.ValidationError(
+                    "Vous devez télécharger uniquement une image."
+                )
+
+        return image
 
 from django import forms
 from django.contrib.auth.models import User
