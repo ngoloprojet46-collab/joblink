@@ -7,18 +7,11 @@
 {% block extra_head %}
 <meta property="og:title" content="{{ service.titre }}" />
 <meta property="og:description" content="{{ service.description|truncatechars:150 }}" />
-
+<meta property="og:image" content="{% if service.image %}{{ service.image.url }}{% elif service.video %}{{ service.video.url }}{% else %}{% static 'default_service.png' %}{% endif %}" />
 <meta property="og:url" content="{{ request.build_absolute_uri }}" />
-
-{% if service.image %}
-<meta property="og:image" content="{{ service.image.url }}" />
-{% else %}
-<meta property="og:image" content="{% static 'default_service.png' %}" />
-{% endif %}
-
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="JobLink" />
-{% endblock}
+{% endblock %}
 
 
 {% block content %}
