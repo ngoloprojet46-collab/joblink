@@ -7,8 +7,17 @@
 {% block extra_head %}
 <meta property="og:title" content="{{ service.titre }}" />
 <meta property="og:description" content="{{ service.description|truncatechars:150 }}" />
-<meta property="og:image" content="{% if service.image %}{{ service.image.url }}{% elif service.video %}{{ service.video.url }}{% else %}{% static 'default_service.png' %}{% endif %}" />
-<meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{% url 'service_detail' service.id %}" />
+
+{% if service.image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ service.image.url }}" />
+{% elif service.video %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ service.video.url }}" />
+{% else %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'default_service.png' %}" />
+{% endif %}
+
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="JobLink" />
 {% endblock %}
@@ -21,6 +30,26 @@
             <h2 class="card-title text-primary fw-bold mb-3 text-center">
                 <i class="bi bi-briefcase-fill"></i> {{ service.titre }}
             </h2>
+
+            <!-- Image ou vidéo du service -->
+            <div class="text-center mb-4">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" 
+                        class="img-fluid rounded shadow"
+                        style="max-height:400px; object-fit:cover;">
+                
+                {% elif service.video %}
+                    <video controls class="w-100 rounded shadow" style="max-height:400px;">
+                        <source src="{{ service.video.url }}">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
+                
+                {% else %}
+                    <img src="{% static 'default_service.png' %}" 
+                        class="img-fluid rounded shadow"
+                        style="max-height:400px;">
+                {% endif %}
+            </div>
 
             <div class="row text-center text-md-start mb-4">
                 <div class="col-md-3 mb-2 mb-md-0">
