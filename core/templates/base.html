@@ -18,7 +18,22 @@
 
     <!-- 🌟 STYLE GLOBAL -->
 
-    
+    <style>
+    .marquee-text {
+        display: inline-block;
+        white-space: nowrap;
+        animation: scrollText 12s linear infinite;
+    }
+
+    @keyframes scrollText {
+        0% {
+            transform: translateX(100%);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
+    }
+    </style>
     <style>
 
         /* === Global === */
@@ -45,7 +60,7 @@
 
         /* Décalage du contenu pour que le header ne le cache pas */
         main.container {
-            margin-top: 80px;   /* Ajuste selon la hauteur réelle de ta navbar */
+            margin-top: 80px;   /* Ajuste selon la hauteur réelle de ta navbar */
         }
 
         /* Réduire la hauteur de la navbar */
@@ -57,12 +72,12 @@
         
 
         .navbar-brand img {
-            height: 32px;  /* ↓ réduis un peu la taille du logo */
+            height: 32px;  /* ↓ réduis un peu la taille du logo */
         }
 
         /* Fixe le header et empêche le contenu d’entrer dedans */
         body {
-            padding-top: 60px; /* Ajustable selon la hauteur de ta navbar */
+            padding-top: 60px; /* Ajustable selon la hauteur de ta navbar */
         }
 
         /* === Navbar === */
