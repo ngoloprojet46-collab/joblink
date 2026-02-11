@@ -8,14 +8,18 @@
     <div class="row">
 
         <!-- ============================
-              🧑‍💼 PROFIL PRESTATAIRE
+            🧑‍💼 PROFIL PRESTATAIRE
         ============================= -->
         <div class="col-md-4">
             <div class="card shadow-sm mb-4">
                 <div class="card-body text-center">
 
                     {% if user.photo %}
-                        <img src="{{ user.photo.url }}" class="rounded-circle mb-3" width="120" height="120">
+                        <img src="{{ user.photo.url }}" 
+                            class="rounded-circle mb-3 shadow-sm"
+                            width="120" height="120"
+                            style="object-fit: cover; cursor:pointer;"
+                            onclick="ouvrirPhoto('{{ user.photo.url }}')">
                     {% else %}
                         <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
                     {% endif %}
@@ -37,7 +41,6 @@
                         <a href="{% url 'gerer_abonnement' %}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi me-1"></i> Mon-abonnement
                         </a>
-                        </a>
                     </div>
 
                 </div>
@@ -45,39 +48,23 @@
 
             <!-- Boutons Boutique -->
             <div class="d-grid gap-2 mb-4">
-
                 {% if request.user.prestataire %}
                     {% if request.user.prestataire.boutique %}
-                        <a 
-                           class="btn btn-outline-secondary">
-                           
-                        </a>
-
                         <a href="{% url 'detail_boutique' request.user.prestataire.boutique.id %}" 
-                            class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
-                            style="
-                                background: linear-gradient(90deg, #4e54c8, #8f94fb);
-                                transition: transform 0.2s, box-shadow 0.2s;
-                            "
-                            onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
-                                <i class="bi bi-shop me-2"></i>  Ma boutique
+                        class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
+                        style="background: linear-gradient(90deg, #4e54c8, #8f94fb);
+                                transition: transform 0.2s, box-shadow 0.2s;"
+                        onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
+                            <i class="bi bi-shop me-2"></i>  Ma boutique
                         </a>
                         <a href="{% url 'modifier_boutique' %}"
-                           class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
-                           style="
-                            background: linear-gradient(90deg, #4e54c8, #8f94fb);
-                            transition: transform 0.2s, box-shadow 0.2s;
-                             "
-                            onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
-                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
-                               <i class="bi bi-pencil-square me-2"></i> Modifier la boutique
-                        </a>
-
-
-                        <a href="{% url 'modifier_boutique' %}"
-                           class="btn btn-outline-secondary">
-                            
+                        class="btn btn-gradient btn-lg px-5 py-3 shadow-lg rounded-pill text-white fw-bold"
+                        style="background: linear-gradient(90deg, #4e54c8, #8f94fb);
+                                transition: transform 0.2s, box-shadow 0.2s;"
+                        onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';">
+                            <i class="bi bi-pencil-square me-2"></i> Modifier la boutique
                         </a>
                     {% else %}
                         <a href="{% url 'creer_boutique' %}" class="btn btn-success">
@@ -86,8 +73,36 @@
                     {% endif %}
                 {% endif %}
             </div>
-            
+
         </div>
+
+        <!-- Modal Global Photo (placer ce modal une seule fois dans la page, en bas) -->
+        <div class="modal fade" id="photoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark border-0 text-center p-3">
+
+            <button type="button"
+                    class="btn-close btn-close-white ms-auto"
+                    data-bs-dismiss="modal">
+            </button>
+
+            <img id="photoModalImage"
+                src=""
+                class="rounded shadow"
+                style="max-height:85vh; max-width:90vw; object-fit: contain; display:block; margin:0 auto;">
+            </div>
+        </div>
+        </div>
+
+        <script>
+        function ouvrirPhoto(url) {
+            let image = document.getElementById("photoModalImage");
+            image.src = url;
+
+            let modal = new bootstrap.Modal(document.getElementById('photoModal'));
+            modal.show();
+        }
+        </script>
 
        <div class="col-md-4">
             {% if derniere_notification %}
@@ -177,12 +192,14 @@
             <div class="card shadow-sm">
                 <div class="card-body">
 
-                    <h5 class="text-center text-success mb-3">Commandes reçues</h5>
+                    <h5 class="text-center text-success mb-4 fw-bold">
+                        Commandes reçues
+                    </h5>
 
                     {% if commandes %}
                         <div class="table-responsive">
-                            <table class="table table-striped align-middle mb-0">
-                                <thead class="table-light">
+                            <table class="table table-striped align-middle">
+                                <thead class="table-light text-center">
                                     <tr>
                                         <th>Service</th>
                                         <th>Client</th>
@@ -193,62 +210,107 @@
                                 </thead>
                                 <tbody>
                                     {% for commande in commandes %}
-                                        <tr>
-                                            <td>{{ commande.service.titre }}</td>
-                                            <td>{{ commande.demandeur.user.username }}</td>
-                                            <td>{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+                                        <tr class="text-center">
 
+                                            <!-- SERVICE -->
+                                            <td class="fw-semibold">
+                                                {{ commande.service.titre }}
+                                            </td>
+
+                                            <!-- CLIENT AVEC PHOTO -->
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    
+                                                    {% if commande.demandeur.user.photo %}
+                                                        <img src="{{ commande.demandeur.user.photo.url }}"
+                                                            class="photo-profil"
+                                                            onclick="ouvrirPhoto('{{ commande.demandeur.user.photo.url }}')">
+                                                    {% else %}
+                                                        <i class="bi bi-person-circle text-primary"
+                                                        style="font-size: 2.5rem;"></i>
+                                                    {% endif %}
+
+                                                    <div class="text-start">
+                                                        <div class="fw-semibold">
+                                                            {{ commande.demandeur.user.username }}
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            {{ commande.demandeur.user.email }}
+                                                        </small>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+
+                                            <!-- DATE -->
+                                            <td>
+                                                {{ commande.date_commande|date:"d/m/Y H:i" }}
+                                            </td>
+
+                                            <!-- STATUT -->
                                             <td>
                                                 {% if commande.statut == 'en_attente' %}
-                                                    <span class="badge bg-warning text-dark">En attente</span>
+                                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                                        En attente
+                                                    </span>
                                                 {% elif commande.statut == 'acceptee' %}
-                                                    <span class="badge bg-primary">Acceptée</span>
+                                                    <span class="badge bg-primary px-3 py-2 rounded-pill">
+                                                        Acceptée
+                                                    </span>
                                                 {% elif commande.statut == 'terminee' %}
-                                                    <span class="badge bg-success">Terminée</span>
+                                                    <span class="badge bg-success px-3 py-2 rounded-pill">
+                                                        Terminée
+                                                    </span>
                                                 {% else %}
-                                                    <span class="badge bg-danger">Annulée</span>
+                                                    <span class="badge bg-danger px-3 py-2 rounded-pill">
+                                                        Annulée
+                                                    </span>
                                                 {% endif %}
                                             </td>
 
-                                            <td class="d-flex gap-1">
+                                            <!-- ACTIONS -->
+                                            <td>
+                                                <div class="d-flex justify-content-center gap-1 flex-wrap">
 
-                                                {% if commande.statut == 'en_attente' %}
-                                                    <a href="{% url 'accepter_commande' commande.id %}"
-                                                       class="btn btn-sm btn-success"
-                                                       title="Accepter">
-                                                        <i class="bi bi-check-circle"></i>
+                                                    {% if commande.statut == 'en_attente' %}
+                                                        <a href="{% url 'accepter_commande' commande.id %}"
+                                                        class="btn btn-sm btn-success"
+                                                        title="Accepter">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </a>
+
+                                                        <a href="{% url 'annuler_commande' commande.id %}"
+                                                        class="btn btn-sm btn-danger"
+                                                        title="Refuser">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </a>
+                                                    {% elif commande.statut == 'acceptee' %}
+                                                        <a href="{% url 'terminer_commande' commande.id %}"
+                                                        class="btn btn-sm btn-primary"
+                                                        title="Terminer">
+                                                            <i class="bi bi-flag"></i>
+                                                        </a>
+                                                    {% endif %}
+
+                                                    <a href="{% url 'supprimer_commande_prestataire' commande.id %}"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    onclick="return confirm('Supprimer cette commande ? 🗑');"
+                                                    title="Supprimer">
+                                                        <i class="bi bi-trash"></i>
                                                     </a>
 
-                                                    <a href="{% url 'annuler_commande' commande.id %}"
-                                                       class="btn btn-sm btn-danger"
-                                                       title="Refuser">
-                                                        <i class="bi bi-x-circle"></i>
-                                                    </a>
-
-                                                {% elif commande.statut == 'acceptee' %}
-                                                    <a href="{% url 'terminer_commande' commande.id %}"
-                                                       class="btn btn-sm btn-primary"
-                                                       title="Terminer">
-                                                        <i class="bi bi-flag"></i>
-                                                    </a>
-                                                {% endif %}
-
-                                                <a href="{% url 'supprimer_commande_prestataire' commande.id %}"
-                                                   class="btn btn-sm btn-outline-secondary"
-                                                   onclick="return confirm('Supprimer cette commande ? 🗑');"
-                                                   title="Supprimer">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-
+                                                </div>
                                             </td>
+
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
-
                     {% else %}
-                        <p class="text-muted">Aucune commande reçue pour le moment.</p>
+                        <p class="text-muted text-center">
+                            Aucune commande reçue pour le moment.
+                        </p>
                     {% endif %}
 
                 </div>
@@ -257,4 +319,34 @@
         </div>
     </div>
 </div>
+<!-- Modal Global Photo -->
+<div class="modal fade" id="photoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark border-0 text-center p-3">
+
+      <button type="button"
+              class="btn-close btn-close-white ms-auto"
+              data-bs-dismiss="modal">
+      </button>
+
+      <img id="photoModalImage"
+            src=""
+            class="rounded shadow"
+            style="max-height:85vh; max-width:90vw; object-fit: contain;">
+            
+    </div>
+  </div>
+</div>
+
+<script>
+function ouvrirPhoto(url) {
+    let image = document.getElementById("photoModalImage");
+    image.src = url;
+
+    let modal = new bootstrap.Modal(document.getElementById('photoModal'));
+    modal.show();
+}
+</script>
 {% endblock %}
+
+

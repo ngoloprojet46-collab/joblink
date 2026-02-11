@@ -24,6 +24,12 @@
     border-radius: 50%;
     border: 4px solid #0d6efd;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .profile-avatar:hover {
+    transform: scale(1.05);
   }
 
   .profile-icon {
@@ -66,7 +72,8 @@
 
         <div class="text-center mb-4">
           {% if user.photo %}
-            <img src="{{ user.photo.url }}" class="profile-avatar shadow-sm">
+            <img src="{{ user.photo.url }}" class="profile-avatar shadow-sm"
+                 onclick="ouvrirPhoto('{{ user.photo.url }}')">
           {% else %}
             <i class="bi-person-circle profile-icon"></i>
           {% endif %}
@@ -74,9 +81,7 @@
 
         <form method="POST" enctype="multipart/form-data" class="profile-form">
           {% csrf_token %}
-
           {{ form.as_p }}
-
           <div class="d-flex justify-content-center mt-3">
             <button type="submit" class="btn fw-semibold py-2 px-4 rounded-3">
               Mettre à jour
@@ -88,5 +93,33 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Global Photo -->
+<div class="modal fade" id="photoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark border-0 text-center p-3">
+
+      <button type="button"
+              class="btn-close btn-close-white ms-auto"
+              data-bs-dismiss="modal">
+      </button>
+
+      <img id="photoModalImage"
+           src=""
+           class="rounded shadow"
+           style="max-height:85vh; max-width:90vw; object-fit: contain; display:block; margin:0 auto;">
+    </div>
+  </div>
+</div>
+
+<script>
+function ouvrirPhoto(url) {
+    let image = document.getElementById("photoModalImage");
+    image.src = url;
+
+    let modal = new bootstrap.Modal(document.getElementById('photoModal'));
+    modal.show();
+}
+</script>
 
 {% endblock %}

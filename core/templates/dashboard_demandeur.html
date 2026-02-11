@@ -11,8 +11,13 @@
         <div class="col-md-4">
             <div class="card shadow-sm mb-4">
                 <div class="card-body text-center">
+
                     {% if user.photo %}
-                        <img src="{{ user.photo.url }}" class="rounded-circle mb-3" width="120" height="120">
+                        <img src="{{ user.photo.url }}" 
+                            class="rounded-circle mb-3 shadow-sm"
+                            width="120" height="120"
+                            style="object-fit: cover; cursor:pointer;"
+                            onclick="ouvrirPhoto('{{ user.photo.url }}')">
                     {% else %}
                         <i class="bi bi-person-circle text-primary" style="font-size: 4rem;"></i>
                     {% endif %}
@@ -23,6 +28,7 @@
                     <a href="{% url 'profil' %}" class="btn btn-primary mb-3">
                         <i class="bi bi-person-circle"></i> Voir mon profil
                     </a>
+
                     <!-- Ajout juste après le bouton "Voir mon profil" -->
                     <a href="{% url 'boite_messages_demandeur' %}" class="btn btn-success mb-3 position-relative">
                         <i class="bi bi-envelope"></i> Boîte de messages
@@ -35,9 +41,7 @@
                     </a>
 
                 </div>
-
             </div>
-
 
             <!-- Notifications récentes -->
             <div class="card shadow-sm mb-4">
@@ -53,7 +57,7 @@
                                     </div>
                                     {% if not notif.lue %}
                                         <a href="{% url 'marquer_notification_lue' notif.id %}" 
-                                           class="btn btn-sm btn-outline-success">Marquer comme lue</a>
+                                        class="btn btn-sm btn-outline-success">Marquer comme lue</a>
                                     {% else %}
                                         <span class="badge bg-success text-white">Lue</span>
                                     {% endif %}
@@ -71,6 +75,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Global Photo (Place ce modal une seule fois dans la page, idéalement en bas de ton body) -->
+        <div class="modal fade" id="photoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark border-0 text-center p-3">
+
+            <button type="button"
+                    class="btn-close btn-close-white ms-auto"
+                    data-bs-dismiss="modal">
+            </button>
+
+            <img id="photoModalImage"
+                src=""
+                class="rounded shadow"
+                style="max-height:85vh; max-width:90vw; object-fit: contain; display:block; margin:0 auto;">
+            </div>
+        </div>
+        </div>
+
+        <script>
+        function ouvrirPhoto(url) {
+            let image = document.getElementById("photoModalImage");
+            image.src = url;
+
+            let modal = new bootstrap.Modal(document.getElementById('photoModal'));
+            modal.show();
+        }
+        </script>
 
         <!-- Commandes passées -->
         <div class="col-md-8 mb-4">
