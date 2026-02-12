@@ -91,6 +91,7 @@ class Service(models.Model):
 
     image = CloudinaryField("image", blank=True, null=True)
     video = CloudinaryField(resource_type="video", blank=True, null=True)
+    est_recent = models.BooleanField(default=False, help_text="Cocher pour forcer ce service comme récent")
 
     def __str__(self):
         return self.titre

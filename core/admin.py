@@ -23,6 +23,9 @@ from django.contrib import admin
 from django.utils import timezone
 from datetime import timedelta
 
+from django.contrib import admin
+from .models import Service
+
 from django.contrib.admin import SimpleListFilter
 from django.utils.timezone import now, timedelta
 
@@ -350,16 +353,45 @@ class AbonnementAdmin(admin.ModelAdmin):
 
 
 
+@admin.action(description="📌 Forcer rotation services récents")
+def forcer_rotation_recents(modeladmin, request, queryset):
+    """
+    Cette action met à jour 9 services comme récents en rotation 3 par 3.
+    """
+    # Réinitialiser tous les services
+    Service.objects.update(est_recent=False)
+
+    # Tous les services disponibles
+    services = list(Service.objects.filter(disponible=True).order_by('-date_publication'))
+
+    total = len(services)
+    if total == 0:
+        modeladmin.message_user(request, "Aucun service disponible pour la rotation.", level="warning")
+        return
+
+    # Pour le test : utiliser l'heure actuelle ou simuler
+    minutes = int(timezone.now().timestamp() // (2 * 60))
+
+    start = (minutes * 3) % total
+
+    for i in range(min(9, total)):
+        index = (start + i) % total
+        services[index].est_recent = True
+        services[index].save()
+
+    modeladmin.message_user(request, "Rotation des services récents appliquée avec succès !")
+
 
     # ---------------------
 # Gestion des Services
 # ---------------------
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'prestataire', 'categorie', 'ville', 'date_publication')
+    list_display = ('titre', 'prestataire', 'categorie', 'ville', 'date_publication', 'est_recent')
     search_fields = ('titre', 'categorie', 'ville', 'prestataire__user__username')
-    list_filter = ('categorie', 'ville', 'date_publication')
+    list_filter = ('categorie', 'ville', 'date_publication', 'est_recent')
 
+    actions = [forcer_rotation_recents]
 
 # ---------------------
 # Gestion des Commandes

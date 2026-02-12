@@ -79,26 +79,64 @@ def renouveler_abonnement(request):
 
 # Page d'accueil
 def home(request):
-    services = Service.objects.order_by('-date_publication')[:9]
+    # 🔹 1️⃣ Slides pour le carousel (9 derniers services publiés)
+    services_carousel = Service.objects.filter(disponible=True).order_by('-date_publication')[:9]
 
     default_bg = "https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
-
     slides = []
-    for s in services:
-        # Vérifie si une image existe
-        if hasattr(s, 'image') and s.image and hasattr(s.image, 'url'):
-            bg = s.image.url
-        else:
-            bg = default_bg
-
+    for s in services_carousel:
+        bg = s.image.url if s.image else default_bg
         slides.append({
             'service': s,
             'bg_url': bg
         })
 
+    # 🔹 2️⃣ Services récents forcés (est_recent=True)
+    services_recents = list(Service.objects.filter(disponible=True, est_recent=True))
+
+    # 🔹 3️⃣ Services populaires (par nombre de commandes)
+    services_populaires = sorted(
+        Service.objects.filter(disponible=True),
+        key=lambda s: s.commande_set.count(),
+        reverse=True
+    )
+
+    # 🔹 4️⃣ Mélanger récents + populaires (sans doublons)
+    mix = []
+    seen_ids = set()
+
+    # Priorité aux récents
+    for s in services_recents:
+        if s.id not in seen_ids:
+            mix.append(s)
+            seen_ids.add(s.id)
+
+    # Ajouter les populaires
+    for s in services_populaires:
+        if s.id not in seen_ids:
+            mix.append(s)
+            seen_ids.add(s.id)
+
+    # Ajouter les autres services pour compléter
+    all_services = Service.objects.filter(disponible=True).order_by('-date_publication')
+    for s in all_services:
+        if s.id not in seen_ids:
+            mix.append(s)
+            seen_ids.add(s.id)
+
+    # 🔹 5️⃣ Rotation automatique 3 par 3 selon l'heure actuelle
+    total = len(mix)
+    services_home = []
+    if total > 0:
+        minutes = int(timezone.now().timestamp() // (2 * 60))
+        start = (minutes * 3) % total
+        for i in range(9):  # toujours 9 services sur la home
+            index = (start + i) % total
+            services_home.append(mix[index])
+
     context = {
-        'slides': slides,
-        'services': services,
+        'slides': slides,          # carousel
+        'services': services_home, # 9 services affichés
         'user_role': request.user.role if request.user.is_authenticated else None
     }
 
@@ -307,6 +345,25 @@ def redirection_dashboard(request):
     # Par défaut
     return redirect('home')
 
+from django.utils import timezone
+
+def rotation_services(queryset, interval_minutes=10):
+    services = list(queryset)
+
+    total = len(services)
+    if total == 0:
+        return services
+
+    periode = int(timezone.now().timestamp() // (interval_minutes * 60))
+    start = (periode * 3) % total
+
+    rotated = []
+    for i in range(total):
+        index = (start + i) % total
+        rotated.append(services[index])
+
+    return rotated
+
 # Page liste des services (vue classique)
 def service_list(request):
     query = request.GET.get('q', '').strip()
@@ -314,7 +371,7 @@ def service_list(request):
     type_boutique = request.GET.get('type_boutique', '').strip()
 
     # Services disponibles uniquement
-    services = Service.objects.filter(disponible=True).order_by('-date_publication')
+    base_queryset = Service.objects.filter(disponible=True).order_by('-date_publication')
 
     # Recherche
     if query:
@@ -333,7 +390,9 @@ def service_list(request):
             prestataire__boutique__categorie=type_boutique
         )
     # Pagination
-    paginator = Paginator(services, 6)
+    services_list = rotation_services(base_queryset, interval_minutes=5)
+
+    paginator = Paginator(services_list, 6)
     page_number = request.GET.get('page', 1)
 
     try:
@@ -360,7 +419,8 @@ def services_feed(request):
     query = request.GET.get('q')
     ville = request.GET.get('ville')
     type_boutique = request.GET.get('type_boutique')  # ✅ nouveau filtre
-    services = Service.objects.filter(disponible=True).order_by('-date_publication')
+    base_queryset = Service.objects.filter(disponible=True).order_by('-date_publication')
+    services_list = rotation_services(base_queryset, interval_minutes=5)
 
     if query:
         services = services.filter(
@@ -376,7 +436,7 @@ def services_feed(request):
             prestataire__boutique__categorie=type_boutique
         )
 
-    paginator = Paginator(services, 6)
+    paginator = Paginator(services_list, 6)
     page_number = request.GET.get('page', 1)
 
     try:

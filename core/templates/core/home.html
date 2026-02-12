@@ -223,7 +223,7 @@
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm border-0">
                         
-                        <!-- 🖼 Image ou 🎥 Vidéo -->
+                        <!-- 🖼 Image ou 🎥 Vidéo cliquable -->
                         {% if service.image %}
                             <a href="{{ service.image.url }}" data-bs-toggle="modal" data-bs-target="#mediaModal{{ service.id }}">
                                 <img src="{{ service.image.url }}" 
@@ -231,26 +231,26 @@
                                      alt="Image du service"
                                      style="height: 200px; object-fit: cover; border-radius: 12px; cursor: pointer;">
                             </a>
-
                         {% elif service.video %}
-                        <div class="position-relative">
-                            <video class="card-img-top rounded-top" 
-                                    style="height: 200px; object-fit: cover; border-radius: 12px;"
-                                    controls>
+                            <div class="position-relative">
+                                <video class="card-img-top rounded-top" 
+                                       style="height: 200px; object-fit: cover; border-radius: 12px;"
+                                       controls>
                                     <source src="{{ service.video.url }}" type="video/mp4">
                                     Votre navigateur ne supporte pas la lecture vidéo.
-                            </video>
-
-
-                            <!-- Bouton lecture au centre -->
-                        </div>
-
+                                </video>
+                            </div>
                         {% else %}
                             <img src="https://res.cloudinary.com/dxndciemg/image/upload/v1763993564/job1_nlecfm.jpg"
-                                class="card-img-top rounded-top"
-                                alt="Aucun média disponible"
-                                style="height: 200px; object-fit: cover; border-radius: 12px;">
+                                 class="card-img-top rounded-top"
+                                 alt="Aucun média disponible"
+                                 style="height: 200px; object-fit: cover; border-radius: 12px;">
                         {% endif %}
+
+                        <!-- Badge service récent 
+                        {% if service.est_recent %}
+                            <span class="badge bg-danger position-absolute mt-2 ms-2">🔥 Service récent</span>
+                        {% endif %} -->
 
                         <!-- Corps de la carte -->
                         <div class="card-body">
@@ -260,12 +260,8 @@
 
                             {% if user.is_authenticated %}
                                 <p class="card-text">{{ service.description|truncatewords:25 }}</p>
-                                <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">
-                                    Voir plus
-                                </a>
-                                <a href="{% url 'envoyer_message' service.id %}" class="btn btn-sm btn-outline-primary">
-                                    💬 Message au prestataire
-                                </a>
+                                <a href="{% url 'service_detail' service.pk %}" class="btn btn-outline-primary btn-sm">Voir plus</a>
+                                <a href="{% url 'envoyer_message' service.id %}" class="btn btn-sm btn-outline-primary">💬 Message au prestataire</a>
                             {% else %}
                                 <p class="text-muted fst-italic">Connectez-vous pour voir plus de détails</p>
                                 <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Connexion</a>
@@ -278,7 +274,7 @@
                     </div>
                 </div>
 
-                <!-- 🪟 Fenêtre modale pour afficher image/vidéo en grand -->
+                <!-- 🪟 Modal pour image/vidéo -->
                 <div class="modal fade" id="mediaModal{{ service.id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content border-0 shadow-lg">
@@ -290,15 +286,15 @@
                                 {% if service.image %}
                                     <img src="{{ service.image.url }}" class="img-fluid rounded shadow" alt="Image du service">
                                 {% elif service.video %}
-                                <video controls class="w-100 rounded shadow">
-                                    <source src="{{ service.video.url }}" type="video/mp4">
-                                </video>
+                                    <video controls class="w-100 rounded shadow">
+                                        <source src="{{ service.video.url }}" type="video/mp4">
+                                    </video>
                                 {% endif %}
-
                             </div>
                         </div>
                     </div>
                 </div>
+
             {% endfor %}
         </div>
     </div>
