@@ -128,7 +128,7 @@ def home(request):
     total = len(mix)
     services_home = []
     if total > 0:
-        minutes = int(timezone.now().timestamp() // (2 * 60))
+        minutes = int(timezone.now().timestamp() // (4 * 60))
         start = (minutes * 3) % total
         for i in range(9):  # toujours 9 services sur la home
             index = (start + i) % total
@@ -347,10 +347,125 @@ def redirection_dashboard(request):
 
 from django.utils import timezone
 
+
+# Page liste des services (vue classique)
+def service_list(request):
+    query = request.GET.get('q', '').strip()
+    ville = request.GET.get('ville', '').strip()
+    type_boutique = request.GET.get('type_boutique', '').strip()
+
+    base_queryset = Service.objects.filter(disponible=True).order_by('-date_publication')
+
+    # 🔎 Recherche
+    if query:
+        base_queryset = base_queryset.filter(
+            Q(titre__icontains=query) |
+            Q(categorie__icontains=query)
+        )
+
+    # 📍 Ville
+    if ville:
+        base_queryset = base_queryset.filter(ville=ville)
+
+    # 🏪 Type boutique
+    if type_boutique:
+        base_queryset = base_queryset.filter(
+            prestataire__boutique__categorie=type_boutique
+        )
+
+    # 🔥 Rotation après filtres
+    services_list = rotation_services(base_queryset, interval_minutes=5)
+
+    paginator = Paginator(services_list, 6)
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page_obj = paginator.page(page_number)
+    except:
+        page_obj = paginator.page(1)
+
+    context = {
+        'services': page_obj,
+        'query': query,
+        'ville': ville,
+        'type_boutique': type_boutique,
+        'villes': Service.VILLES_CI,
+        'user_role': request.user.role if request.user.is_authenticated else None
+    }
+
+    return render(request, 'core/service_list.html', context)
+
+
+
+
+# API pour infinite scroll (Ajax)
+
+def services_feed(request):
+    query = request.GET.get('q', '').strip()
+    ville = request.GET.get('ville', '').strip()
+    type_boutique = request.GET.get('type_boutique', '').strip()
+    page_number = request.GET.get('page', 1)
+
+    base_queryset = Service.objects.filter(disponible=True).order_by('-date_publication')
+
+    # 🔎 Recherche
+    if query:
+        base_queryset = base_queryset.filter(
+            Q(titre__icontains=query) |
+            Q(categorie__icontains=query)
+        )
+
+    # 📍 Ville
+    if ville:
+        base_queryset = base_queryset.filter(ville=ville)
+
+    # 🏪 Type boutique (CORRIGÉ ICI)
+    if type_boutique:
+        base_queryset = base_queryset.filter(
+            prestataire__boutique__categorie=type_boutique
+        )
+
+    # 🔥 Rotation UNIQUEMENT page 1
+    if str(page_number) == "1":
+        services_list = rotation_services(base_queryset, interval_minutes=5)
+    else:
+        services_list = list(base_queryset)
+
+    paginator = Paginator(services_list, 6)
+
+    try:
+        page_obj = paginator.page(page_number)
+    except:
+        page_obj = paginator.page(1)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        cards_html = ""
+        for service in page_obj:
+            cards_html += render_to_string(
+                'core/partials/service_card.html',
+                {'service': service},
+                request=request
+            )
+        return JsonResponse({
+            'cards_html': cards_html,
+            'has_next': page_obj.has_next()
+        })
+
+    context = {
+        'services': page_obj,
+        'query': query,
+        'ville': ville,
+        'type_boutique': type_boutique,
+        'villes': Service.VILLES_CI,
+        'user_role': request.user.role if request.user.is_authenticated else None
+    }
+
+    return render(request, 'core/service_list.html', context)
+
 def rotation_services(queryset, interval_minutes=10):
     services = list(queryset)
-
     total = len(services)
+
     if total == 0:
         return services
 
@@ -363,107 +478,6 @@ def rotation_services(queryset, interval_minutes=10):
         rotated.append(services[index])
 
     return rotated
-
-# Page liste des services (vue classique)
-def service_list(request):
-    query = request.GET.get('q', '').strip()
-    ville = request.GET.get('ville', '').strip()
-    type_boutique = request.GET.get('type_boutique', '').strip()
-
-    # Services disponibles uniquement
-    base_queryset = Service.objects.filter(disponible=True).order_by('-date_publication')
-
-    # Recherche
-    if query:
-        services = services.filter(
-            Q(titre__icontains=query) |
-            Q(categorie__icontains=query)
-        )
-
-    # Filtre par ville
-    if ville:
-        services = services.filter(ville=ville)
-
-    # 🔥 Nouveau filtre par type de boutique
-    if type_boutique:
-        services = services.filter(
-            prestataire__boutique__categorie=type_boutique
-        )
-    # Pagination
-    services_list = rotation_services(base_queryset, interval_minutes=5)
-
-    paginator = Paginator(services_list, 6)
-    page_number = request.GET.get('page', 1)
-
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-
-    context = {
-        'services': page_obj,
-        'query': query,
-        'ville': ville,
-        'villes': Service.VILLES_CI,
-        'user_role': request.user.role if request.user.is_authenticated else None
-    }
-
-    return render(request, 'core/service_list.html', context)
-
-
-# API pour infinite scroll (Ajax)
-
-def services_feed(request):
-    query = request.GET.get('q')
-    ville = request.GET.get('ville')
-    type_boutique = request.GET.get('type_boutique')  # ✅ nouveau filtre
-    base_queryset = Service.objects.filter(disponible=True).order_by('-date_publication')
-    services_list = rotation_services(base_queryset, interval_minutes=5)
-
-    if query:
-        services = services.filter(
-            Q(titre__icontains=query) | 
-            Q(categorie__icontains=query)
-        )
-
-    if ville:
-        services = services.filter(ville=ville)
-
-    if type_boutique:
-        services = services.filter(
-            prestataire__boutique__categorie=type_boutique
-        )
-
-    paginator = Paginator(services_list, 6)
-    page_number = request.GET.get('page', 1)
-
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)  # ⚠ Dernière page au lieu de liste vide
-
-    # Si requête Ajax
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        cards_html = ""
-        for service in page_obj:
-            cards_html += render_to_string('core/partials/service_card.html', {'service': service}, request=request)
-        return JsonResponse({'cards_html': cards_html, 'has_next': page_obj.has_next()})
-
-    context = {
-        'services': page_obj,
-        'query': query,
-        'ville': ville,
-        'type_boutique' : type_boutique,
-        'villes': Service.VILLES_CI,
-        'user_role': request.user.role if request.user.is_authenticated else None
-    }
-    return render(request, 'core/service_list.html', context)
-
-
 # Détail d’un service
 def service_detail(request, pk):
     service = get_object_or_404(Service, pk=pk)
