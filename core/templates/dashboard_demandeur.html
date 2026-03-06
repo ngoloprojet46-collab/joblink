@@ -2,6 +2,16 @@
 {% block content %}
 
 <div class="container py-5">
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     <h2 class="mb-4 text-primary text-center fw-bold">Espace Demandeur</h2>
 
     <div class="row">

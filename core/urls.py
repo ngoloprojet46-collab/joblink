@@ -20,6 +20,7 @@ urlpatterns = [
     
 
     path('apropos/', views.apropos, name='apropos'),
+    path('verifier-phone/', views.verifier_phone, name='verifier_phone'),
 
 
     #path('test-email/', views.test_email, name='test_email'),

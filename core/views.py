@@ -164,6 +164,18 @@ def register_view(request):
         form = UserRegisterForm()
     return render(request, 'registration/register.html', {'form': form})
 
+from django.http import JsonResponse
+from .models import User
+
+def verifier_phone(request):
+    phone = request.GET.get('phone', None)
+
+    if phone:
+        existe = User.objects.filter(phone=phone).exists()
+        return JsonResponse({'existe': existe})
+
+    return JsonResponse({'existe': False})
+
 
 @login_required
 def creer_boutique(request):
@@ -543,7 +555,7 @@ def commander_service(request, service_id):
 
     if Commande.objects.filter(service=service, demandeur=demandeur).exists():
         messages.warning(request, "Vous avez déjà commandé ce service ❗")
-        return redirect('dashboard')
+        return redirect(request.META.get('HTTP_REFERER'))
 
     # Création de la commande
     commande = Commande.objects.create(
@@ -568,7 +580,8 @@ def commander_service(request, service_id):
         )
 
     messages.success(request, "Votre commande a été enregistrée avec succès ✅")
-    return redirect('dashboard')
+    return redirect(request.META.get('HTTP_REFERER'))
+
 
 
 @login_required

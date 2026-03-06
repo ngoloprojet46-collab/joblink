@@ -17,10 +17,28 @@
                     {{ form.categorie }}
                 </div>
 
-                <!-- Affichage des autres champs automatiquement -->
-                {{ form.nom }}
-                {{ form.description }}
-                {{ form.image }}
+                <!-- Nom -->
+                <div class="mb-3">
+                    {{ form.nom.label_tag }}
+                    {{ form.nom }}
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                </div>
+
+                <!-- Image -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Image de la boutique</label>
+                    {{ form.image }}
+
+                    <!-- Indication ajoutée -->
+                    <small class="text-muted">
+                        📷 Sélectionnez une photo pour représenter votre boutique.
+                    </small>
+                </div>
 
                 <div class="d-grid mt-3">
                     <button type="submit" class="btn btn-success">

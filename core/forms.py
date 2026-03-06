@@ -2,10 +2,6 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 from .models import Service
-from django import forms
-
-
-from django import forms
 from .models import Abonnement
 
 class PreuvePaiementForm(forms.ModelForm):
@@ -13,11 +9,9 @@ class PreuvePaiementForm(forms.ModelForm):
         model = Abonnement
         fields = ['preuve_paiement']
 
-
-
 from django.contrib.auth.forms import UserCreationForm
-from django import forms
-from .models import User
+
+
 
 
 class UserRegisterForm(UserCreationForm):
@@ -44,7 +38,14 @@ class UserRegisterForm(UserCreationForm):
     ]
 
     role = forms.ChoiceField(choices=ROLE_CHOICES, widget=forms.RadioSelect)
-    phone = forms.CharField(label="Téléphone", required=True)
+    phone = forms.CharField(
+    label="Téléphone",
+    required=True,
+    widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Exemple : 07 00 00 00 00'
+    })
+)
 
     # 🔥 Nouveaux champs
     source = forms.ChoiceField(
@@ -66,14 +67,20 @@ class UserRegisterForm(UserCreationForm):
     )
 
     password1 = forms.CharField(
-        label="Mot de passe",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        required=True
+    label="Mot de passe",
+    widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Créer un mot de passe'
+    }),
+    required=True
     )
 
     password2 = forms.CharField(
         label="Confirmer le mot de passe",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirmer le mot de passe'
+        }),
         required=True
     )
 
@@ -91,6 +98,34 @@ class UserRegisterForm(UserCreationForm):
             'password1',
             'password2',
         ]
+        widgets = {
+
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Exemple : Kone-Karim'
+            }),
+
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Exemple : kone@gmail.com'
+            }),
+
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Exemple : 07 00 00 00 00'
+            }),
+
+            'photo': forms.ClearableFileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+
+            'suggestion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Votre suggestion pour améliorer JobLink (facultatif)',
+                'rows': 3
+            }),
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")

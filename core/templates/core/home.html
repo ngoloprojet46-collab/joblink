@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+        
 
 <style>
 .pub-section h2 {
@@ -169,7 +170,16 @@
 </a>
 
 </div>
-
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 <!-- CARROUSEL DANS LA MÊME SECTION SOMBRE -->
 <section class="pub-section py-5" style="background: #afb4b6;">
   <div class="container">
@@ -211,7 +221,6 @@
     </div>
   </div>
 </section>
-
 
 <!-- Section des services récents -->
 <section class="mt-5">
